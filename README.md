@@ -12,6 +12,7 @@ js/arcade.js            le socle : son, records, préférences
 js/accueil.js           le hall
 jeux/chute/             une machine
 jeux/stack/             une machine
+jeux/mot/               une machine
 ```
 
 Chaque jeu charge `css/arcade.css` puis sa propre feuille, qui redéfinit
@@ -63,6 +64,49 @@ d'en dessous est coupé et tombe, et la barre repart de la largeur restante.
 | Recommencer | `R` | bouton « Nouvelle partie » |
 | Couper le son | `M` | bouton « Son » |
 
+### Le Mot du Jour · accent vert
+
+Un mot français de cinq lettres, six essais. Le même pour tout le monde, un seul
+par jour : le mot se déduit de la date, sans serveur ni synchronisation.
+
+- **Les accents ne comptent pas.** Tout est normalisé en majuscules sans
+  diacritiques, à la saisie comme dans les listes : on tape `E` pour `É`.
+- Les lettres en double sont jugées en **deux passes** : les bien placées
+  d'abord, les autres piochent dans ce qu'il reste. Sans ça, `ELLES` contre un
+  mot à un seul `E` afficherait deux `E` présents.
+- La partie du jour, les statistiques et les réglages survivent au rechargement.
+  La grille se partage en carrés emoji, par le presse-papiers ou, s'il est
+  refusé, dans une zone de texte à copier.
+- Le record de cette machine est la **meilleure série de jours consécutifs**.
+- Clavier **AZERTY** à l'écran, et le clavier physique marche aussi.
+- Un bouton **Contraste** remplace le couple vert / ambre par bleu / orange,
+  lisible pour les daltonismes rouge-vert. L'état « présent » porte en plus un
+  losange, pour que la couleur ne soit jamais seule à porter l'information.
+
+| Action | Clavier | Tactile / souris |
+| --- | --- | --- |
+| Écrire | les lettres | clavier à l'écran |
+| Valider | `Entrée` | touche « Entrée » |
+| Effacer | `Retour arrière` | touche « ⌫ » |
+| Couper le son | `M` | bouton « Son » |
+
+#### Les listes de mots
+
+`jeux/mot/mots.js` contient deux listes, en majuscules sans accent, concaténées
+sans séparateur pour tenir en peu de place :
+
+- **581 solutions**, soit 1,6 an de mots quotidiens, choisies à la main depuis un
+  vivier classé par fréquence : uniquement des noms, adjectifs et infinitifs
+  courants. Ni formes conjuguées, ni mots-outils, ni noms propres, ni
+  vulgarités. L'ordre est mélangé pour qu'un jour ne trahisse pas le suivant.
+- **6 721 formes acceptées** en proposition, formes conjuguées comprises, pour
+  qu'un mot français valide ne soit jamais refusé.
+
+Sources : [hbenbel/French-Dictionary](https://github.com/hbenbel/French-Dictionary)
+et [Taknok/French-Wordlist](https://github.com/Taknok/French-Wordlist) pour les
+formes, [hermitdave/FrequencyWords](https://github.com/hermitdave/FrequencyWords)
+(OpenSubtitles 2018) pour le classement par fréquence.
+
 ## Ce que le socle fournit
 
 - **Le son**, entièrement synthétisé avec l'API Web Audio : aucun fichier audio
@@ -72,8 +116,10 @@ d'en dessous est coupé et tombe, et la barre repart de la largeur restante.
   série s'entend avant de se lire — les cascades dans Chute, les poses
   parfaites dans Stack.
 - **Les records**, sous `arcade.record.<jeu>` dans le `localStorage`, lus par le
-  hall pour afficher le meilleur de chaque machine. Chaque accès est protégé :
-  un navigateur qui refuse le stockage fait perdre le record, pas la partie.
+  hall pour afficher le meilleur de chaque machine, et **un état libre** par jeu
+  (`Arcade.read` / `Arcade.write`) pour les parties en cours et les
+  statistiques. Chaque accès est protégé : un navigateur qui refuse le stockage
+  fait perdre la sauvegarde, pas la partie.
 - **Le réglage du son**, commun à toute la collection : coupé ici, coupé partout.
 - **Le châssis** : rails, tableau de bord, jauge, écran de fin, boutons.
 
@@ -87,6 +133,8 @@ et les effets décoratifs (étincelles, ondes, secousses, débris) disparaissent
   transitions CSS dont la durée est calculée selon la distance de chute. Les
   fusions sont trouvées par remplissage par diffusion sur les valeurs
   identiques, ce qui gère les groupes de trois tuiles et plus.
+- **Le Mot du Jour** n'anime que des classes CSS : la révélation d'une ligne est
+  une suite de retournements décalés, déclenchés par minuterie.
 - **Stack** dessine sur une toile `canvas` : le ciel, les étoiles, la tour et
   les débris y sont peints à chaque frame. La tour est stockée en pixels et
   remise à l'échelle au redimensionnement.

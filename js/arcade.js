@@ -99,6 +99,19 @@ window.Arcade = (() => {
     store.set(RECORD_PREFIX + game, String(value));
   }
 
+  /* État libre d'un jeu (partie en cours, statistiques, réglages), en JSON.
+     Un navigateur qui refuse le stockage fait perdre la sauvegarde, pas la partie. */
+
+  function read(key, fallback = null) {
+    const raw = store.get('arcade.' + key);
+    if (raw === null) return fallback;
+    try { return JSON.parse(raw); } catch (e) { return fallback; }
+  }
+
+  function write(key, value) {
+    store.set('arcade.' + key, JSON.stringify(value));
+  }
+
   /* ---------- petits utilitaires d'animation ---------- */
 
   /* Relance une animation CSS déjà posée sur l'élément. */
@@ -116,5 +129,5 @@ window.Arcade = (() => {
     node.classList.add('shake');
   }
 
-  return { reduced, ms, wait, boot, tone, sfx, step, muted, setMuted, bindMute, record, setRecord, replay, shake, audio };
+  return { reduced, ms, wait, boot, tone, sfx, step, muted, setMuted, bindMute, record, setRecord, read, write, replay, shake, audio };
 })();

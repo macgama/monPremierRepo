@@ -39,6 +39,7 @@
 
 .card--chute { --accent: #ff5a2b; }
 .card--stack { --accent: #4fd8e8; }
+.card--mot   { --accent: #7bc47f; }
 
 .card-body { display: grid; gap: 4px; }
 
@@ -111,6 +112,20 @@
 @keyframes miniSlide {
   0%, 100% { transform: translateX(-17px); }
   50%      { transform: translateX(17px); }
+}
+
+/* Le Mot : une ligne jugée, et la suivante qui se retourne. */
+.art--mot i { width: 16px; height: 16px; }
+.art--mot .c1 { left: 10px; bottom: 40px; background: var(--rail); }
+.art--mot .c2 { left: 30px; bottom: 40px; background: #d9a12c; }
+.art--mot .c3 { left: 50px; bottom: 40px; background: var(--rail); }
+.art--mot .c4 { left: 10px; bottom: 18px; background: #4f9b55; animation: miniFlip 2.8s ease-in-out infinite; }
+.art--mot .c5 { left: 30px; bottom: 18px; background: #4f9b55; animation: miniFlip 2.8s ease-in-out infinite .16s; }
+.art--mot .c6 { left: 50px; bottom: 18px; background: #4f9b55; animation: miniFlip 2.8s ease-in-out infinite .32s; }
+
+@keyframes miniFlip {
+  0%, 58%, 100% { transform: scaleY(1); }
+  68%           { transform: scaleY(0.08); }
 }
 
 /* ---------- L'atelier ---------- */
