@@ -23,6 +23,7 @@ jeux/quitte/            une machine
 jeux/ricochet/          une machine
 jeux/intrus/            une machine
 jeux/cadence/           une machine
+jeux/fonte/             une machine
 ```
 
 Chaque jeu charge `css/arcade.css` puis sa propre feuille, qui redéfinit
@@ -453,6 +454,65 @@ le pouls ; la mélodie, c'est le joueur qui la joue — chaque voie a sa note.
 | Frapper une voie | `D` `F` `J` `K`, ou les flèches | toucher la voie |
 | Recommencer | `R` | bouton « Nouvelle partie » |
 | Couper le son | `M` | bouton « Son » |
+
+### Fonte · accent ambre
+
+Une fonderie qu'on lance à la main et qui finit par tourner seule. On pioche du
+minerai, on le fond, on vend le lingot ; puis on achète les bâtiments qui le
+feront à votre place, du mineur à l'aciérie. Et quand la courbe s'essouffle, on
+refond tout pour repartir plus vite.
+
+- **L'équilibrage est le jeu.** Une chaîne qui s'étrangle ou une courbe qui
+  plafonne, et il n'y a rien à sauver. Les nombres ne sont donc pas devinés :
+  ils sortent d'une simulation qui fait tourner une heure d'usine en quelques
+  millisecondes, avec de vrais stocks et une politique d'achat qui comprend la
+  chaîne (les écus d'abord, sinon les lingots, sinon le minerai).
+- Ce que cette simulation a écarté : une première table où le premier
+  convertisseur ne tombait qu'à la **43ᵉ minute** et la première aciérie à la
+  **52ᵉ** — trente minutes sans rien de neuf à regarder. Puis, à l'autre bout,
+  des tables assez généreuses pour ouvrir la chaîne en dix minutes mais qui
+  finissaient à 10¹⁷ écus par seconde, avec trois cent cinquante exemplaires de
+  chaque bâtiment.
+- La table retenue : coûts en **1,12ⁿ**, production d'un type **doublée tous
+  les neuf exemplaires**. Elle ouvre les cinq étages en dix-huit minutes et ne
+  s'emballe pas.
+
+  | | mesuré |
+  | --- | --- |
+  | premier four | 1,9 min |
+  | premier lamineur | 4,0 min |
+  | premier convertisseur | 13,2 min |
+  | première aciérie | 17,6 min |
+  | un million d'écus | 17,1 min |
+  | cent millions | 21,6 min |
+  | revenu après une heure | 4,5 milliards/s |
+  | bâtiments après une heure | 198 / 180 / 179 / 153 / 123 |
+
+- **L'or d'une refonte suit un logarithme**, pas une racine : les gains d'un jeu
+  de ce genre montent plus vite que n'importe quelle puissance, et avec une
+  racine carrée la troisième refonte était gratuite — la simulation donnait
+  7 156 puis 7 879 339 d'or. Avec `15 × log₁₀(gagné / 10⁸)`, la boucle converge :
+  +30, +24, +15, +6, +2, et le bonus se stabilise vers ×4.
+- **Le banc d'essai joue contre le code livré**, pas contre une copie : la
+  politique d'achat de la simulation pilote le vrai `tourner()` du jeu par
+  `window.Fonte`. Les neuf jalons du tableau ci-dessus retombent au dixième de
+  minute près. Sans cela, une table réglée hors ligne ne prouverait rien sur le
+  jeu réellement servi.
+- L'usine **continue sans vous**, à mi-régime et pour quatre heures au plus. Le
+  rattrapage n'est pas une formule : c'est la même boucle de production,
+  rejouée seconde par seconde au retour.
+- La consigne d'accueil se déclenche sur une **usine à laquelle personne n'a
+  touché**, pas sur l'absence de sauvegarde : ouvrir la page puis la fermer en
+  crée une, et le conseil d'ouverture disparaissait avant d'avoir servi.
+- La durée d'affichage d'un message ne passe pas par `Arcade.ms()`. Cette
+  fonction écrase les durées à une frame quand le mouvement réduit est demandé,
+  ce qui convient à une animation et jamais à un texte qu'il faut lire.
+
+| Action | Clavier | Tactile / souris |
+| --- | --- | --- |
+| Piocher | `Espace` | le carreau de mine |
+| Acheter un bâtiment | — | son bouton, par 1, 10 ou au maximum |
+| Couper le son | — | bouton « Son » |
 
 ## Ce que le socle fournit
 
