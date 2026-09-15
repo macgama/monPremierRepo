@@ -3,75 +3,65 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Chute</title>
-<meta name="description" content="Jeu web : lâchez des tuiles dans la chute, fusionnez les valeurs identiques, déclenchez des cascades.">
+<title>Machines</title>
+<meta name="description" content="Une collection de petites machines à jouer, en HTML, CSS et JavaScript, sans dépendance.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Bungee&family=IBM+Plex+Mono:wght@400;600&display=swap">
-<link rel="stylesheet" href="css/chute.css">
+<link rel="stylesheet" href="css/arcade.css">
+<link rel="stylesheet" href="css/accueil.css">
 </head>
 <body>
-<main class="cabinet">
+<main class="cabinet hall">
 
   <header class="head">
-    <h1 class="mark">Chute</h1>
-    <p class="tag">Vise. Lâche. Fusionne.</p>
+    <h1 class="mark">Machines</h1>
+    <p class="tag">Petites machines à jouer</p>
   </header>
 
-  <section class="readout" aria-label="Tableau de bord">
-    <div class="stat">
-      <span class="lab">Score</span>
-      <b class="val" id="score" aria-live="polite">0</b>
-    </div>
-    <div class="stat">
-      <span class="lab">Record</span>
-      <b class="val" id="best">0</b>
-    </div>
-    <div class="stat stat--next">
-      <span class="lab">Suivant</span>
-      <div class="chip" id="next" aria-label="Prochaine tuile"></div>
-    </div>
-  </section>
+  <nav class="machines" aria-label="Les machines">
 
-  <div class="meter" id="meter">
-    <div class="meter-head">
-      <span class="lab" id="meterLab">Montée · palier 1</span>
-      <span class="lab" id="meterLeft">14 coups</span>
+    <a class="card card--chute" href="jeux/chute/index.html">
+      <span class="art art--chute" aria-hidden="true">
+        <i class="a1"></i><i class="a2"></i><i class="a3"></i><i class="a4"></i>
+      </span>
+      <span class="card-body">
+        <h2 class="card-name">Chute</h2>
+        <p class="card-desc">Lâchez des tuiles, fusionnez les valeurs identiques, déclenchez des
+          cascades. Tous les quelques coups, une rangée pousse par le bas.</p>
+        <p class="card-meta"><span class="lab">Record</span> <b data-record="chute">—</b></p>
+      </span>
+    </a>
+
+    <a class="card card--stack" href="jeux/stack/index.html">
+      <span class="art art--stack" aria-hidden="true">
+        <i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i>
+      </span>
+      <span class="card-body">
+        <h2 class="card-name">Stack</h2>
+        <p class="card-desc">Une barre glisse, un appui la pose. Ce qui dépasse est coupé et tombe.
+          Posez pile-poil pour ne rien perdre.</p>
+        <p class="card-meta"><span class="lab">Record</span> <b data-record="stack" data-unit="étage">—</b></p>
+      </span>
+    </a>
+
+    <div class="soon">
+      <span class="art" aria-hidden="true">+</span>
+      <p>L'atelier tourne. Les prochaines à sortir : <strong>Le Mot du Jour</strong>, un mot
+        français par jour, et <strong>Rebond</strong>, une chute libre à un bouton.</p>
     </div>
-    <div class="meter-track"><i id="meterFill"></i></div>
-  </div>
 
-  <div class="stage">
-    <div class="rail" aria-hidden="true"></div>
-    <div class="playfield" id="playfield">
-      <div class="guide" id="guide" aria-hidden="true"><i></i></div>
-      <div class="grid" id="cells" aria-hidden="true"></div>
-      <div class="layer" id="tiles"></div>
-      <div class="combo" id="combo" hidden></div>
-      <div class="over" id="over" hidden>
-        <p class="over-kicker">Chute bouchée</p>
-        <p class="over-score" id="overScore">0</p>
-        <p class="over-note" id="overNote">Plus haute tuile : 2</p>
-        <button class="btn btn--main" id="again" type="button">Rejouer</button>
-      </div>
-    </div>
-    <div class="rail" aria-hidden="true"></div>
-  </div>
+  </nav>
 
-  <div class="pad">
-    <button class="btn" id="left" type="button" aria-label="Colonne de gauche">◀</button>
-    <button class="btn btn--main" id="drop" type="button">Lâcher</button>
-    <button class="btn" id="right" type="button" aria-label="Colonne de droite">▶</button>
-  </div>
+  <p class="help">Tout tourne côté navigateur, sans compte ni réseau. Les records restent sur cet
+    appareil, et le réglage du son vaut pour toutes les machines.</p>
 
-  <p class="help">Flèches ou <kbd>A</kbd>/<kbd>D</kbd> pour viser · <kbd>Espace</kbd> pour lâcher · ou touchez une colonne. Tous les
-    quelques coups, une rangée pousse par le bas.</p>
   <div class="foot">
-    <button class="ghost" id="restart" type="button">Nouvelle partie</button>
     <button class="ghost" id="mute" type="button" aria-pressed="false">Son : actif</button>
   </div>
 
 </main>
-<script src="js/chute.js"></script>
+<script src="js/arcade.js"></script>
+<script src="js/accueil.js"></script>
 </body>
 </html>

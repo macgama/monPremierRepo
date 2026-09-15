@@ -11,12 +11,9 @@
   const ROWS = 7;
   const GAP = 8;
   const MAX_CELL = 66;
-  const STORE_KEY = 'chute.record';
-  const MUTE_KEY = 'chute.muet';
+  const GAME = 'chute';
 
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const ms = (n) => (reduced ? 1 : n);
-  const wait = (n) => new Promise((r) => setTimeout(r, ms(n)));
+  const { reduced, ms, wait } = Arcade;
 
   const el = {
     root: document.documentElement,
@@ -56,65 +53,19 @@
   let comboTimer = 0;
 
   /* ---------- son ---------- */
-  /* Tout est synthétisé à la volée : aucun fichier audio à charger. */
-
-  const sound = { ctx: null, on: true };
-
-  function bootAudio() {
-    if (sound.ctx) {
-      if (sound.ctx.state === 'suspended') sound.ctx.resume();
-      return;
-    }
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (AC) sound.ctx = new AC();
-  }
-
-  function tone({ freq, to, dur, type = 'triangle', vol = 0.16, delay = 0 }) {
-    if (!sound.on || !sound.ctx) return;
-    const ctx = sound.ctx;
-    const t0 = ctx.currentTime + delay;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = type;
-    osc.frequency.setValueAtTime(freq, t0);
-    if (to) osc.frequency.exponentialRampToValueAtTime(to, t0 + dur);
-    gain.gain.setValueAtTime(0.0001, t0);
-    gain.gain.exponentialRampToValueAtTime(vol, t0 + 0.012);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-    osc.connect(gain).connect(ctx.destination);
-    osc.start(t0);
-    osc.stop(t0 + dur + 0.03);
-  }
-
-  // Échelle majeure étendue : chaque maillon de cascade monte d'un degré.
-  const LADDER = [0, 4, 7, 12, 16, 19, 24, 28, 31, 36];
+  /* Le socle fournit le synthétiseur ; Chute n'ajoute que son grondement. */
 
   const sfx = {
-    aim:  () => tone({ freq: 880, dur: 0.025, type: 'sine', vol: 0.03 }),
-    land: () => tone({ freq: 190, to: 90, dur: 0.09, type: 'square', vol: 0.07 }),
-    merge(combo) {
-      const semi = LADDER[Math.min(combo, LADDER.length) - 1];
-      const f = 330 * Math.pow(2, semi / 12);
-      tone({ freq: f, to: f * 1.5, dur: 0.16, type: 'triangle', vol: 0.15 });
-      tone({ freq: f / 2, dur: 0.2, type: 'sine', vol: 0.09 });
-    },
-    push: () => {
-      tone({ freq: 120, to: 44, dur: 0.34, type: 'sawtooth', vol: 0.13 });
-      tone({ freq: 240, to: 150, dur: 0.18, type: 'square', vol: 0.05 });
-    },
-    nope: () => tone({ freq: 150, to: 110, dur: 0.1, type: 'square', vol: 0.06 }),
-    over: () => {
-      [440, 349, 262, 196].forEach((f, i) =>
-        tone({ freq: f, dur: 0.3, type: 'triangle', vol: 0.13, delay: i * 0.13 }));
+    aim: Arcade.sfx.tick,
+    land: Arcade.sfx.thud,
+    merge: (combo) => Arcade.sfx.chain(combo),
+    nope: Arcade.sfx.deny,
+    over: Arcade.sfx.over,
+    push() {
+      Arcade.tone({ freq: 120, to: 44, dur: 0.34, type: 'sawtooth', vol: 0.13 });
+      Arcade.tone({ freq: 240, to: 150, dur: 0.18, type: 'square', vol: 0.05 });
     },
   };
-
-  function setMuted(muted) {
-    sound.on = !muted;
-    el.mute.textContent = muted ? 'Son : coupé' : 'Son : actif';
-    el.mute.setAttribute('aria-pressed', String(muted));
-    try { localStorage.setItem(MUTE_KEY, muted ? '1' : '0'); } catch (e) { /* indisponible */ }
-  }
 
   /* ---------- géométrie ---------- */
 
@@ -132,6 +83,7 @@
     s.setProperty('--grid-w', gw + 'px');
     s.setProperty('--grid-h', gh + 'px');
     s.setProperty('--pad-top', cell + GAP + 'px');
+    s.setProperty('--panel-w', gw + 36 + 'px');   // plateau + les deux rails
 
     for (const t of allTiles()) place(t, 0);
     if (held) place(held, 0);
@@ -407,13 +359,7 @@
     }
   }
 
-  function shake(strength) {
-    if (reduced) return;
-    el.stage.style.setProperty('--amp', Math.min(strength, 5) * 1.5 + 'px');
-    el.stage.classList.remove('shake');
-    void el.stage.offsetWidth;
-    el.stage.classList.add('shake');
-  }
+  const shake = (strength) => Arcade.shake(el.stage, strength);
 
   function banner(combo) {
     if (combo < 2) return;
@@ -528,13 +474,8 @@
 
   /* ---------- persistance ---------- */
 
-  function save() {
-    try { localStorage.setItem(STORE_KEY, String(best)); } catch (e) { /* indisponible */ }
-  }
-
-  function load() {
-    try { return parseInt(localStorage.getItem(STORE_KEY), 10) || 0; } catch (e) { return 0; }
-  }
+  const save = () => Arcade.setRecord(GAME, best);
+  const load = () => Arcade.record(GAME);
 
   /* ---------- cycle de vie ---------- */
 
@@ -590,13 +531,13 @@
   /* ---------- entrées ---------- */
 
   addEventListener('keydown', (e) => {
-    bootAudio();
+    Arcade.boot();
     const k = e.key.toLowerCase();
     if (k === 'arrowleft' || k === 'a' || k === 'q') { setAim(aim - 1); e.preventDefault(); }
     else if (k === 'arrowright' || k === 'd') { setAim(aim + 1); e.preventDefault(); }
     else if (k === ' ' || k === 'arrowdown' || k === 's' || k === 'enter') { drop(); e.preventDefault(); }
     else if (k === 'r') { reset(); }
-    else if (k === 'm') { setMuted(sound.on); }
+    else if (k === 'm') { el.mute.click(); }
   });
 
   const colFromEvent = (e) => {
@@ -606,7 +547,7 @@
 
   let pointing = false;
   el.playfield.addEventListener('pointerdown', (e) => {
-    bootAudio();
+    Arcade.boot();
     if (over) return;
     pointing = true;
     el.playfield.setPointerCapture(e.pointerId);
@@ -622,18 +563,15 @@
   });
   el.playfield.addEventListener('pointercancel', () => { pointing = false; });
 
-  document.getElementById('left').addEventListener('click', () => { bootAudio(); setAim(aim - 1); });
-  document.getElementById('right').addEventListener('click', () => { bootAudio(); setAim(aim + 1); });
-  document.getElementById('drop').addEventListener('click', () => { bootAudio(); drop(); });
+  document.getElementById('left').addEventListener('click', () => { Arcade.boot(); setAim(aim - 1); });
+  document.getElementById('right').addEventListener('click', () => { Arcade.boot(); setAim(aim + 1); });
+  document.getElementById('drop').addEventListener('click', () => { Arcade.boot(); drop(); });
   document.getElementById('restart').addEventListener('click', () => reset());
   document.getElementById('again').addEventListener('click', () => reset());
-  el.mute.addEventListener('click', () => { bootAudio(); setMuted(sound.on); });
 
   addEventListener('resize', layout);
 
-  let wasMuted = false;
-  try { wasMuted = localStorage.getItem(MUTE_KEY) === '1'; } catch (e) { /* indisponible */ }
-  setMuted(wasMuted);
+  Arcade.bindMute(el.mute);
 
   /* Reprise d'état quand la page est republiée sous les yeux d'un joueur. */
   const hot = window.claude?.hot;
