@@ -18,6 +18,7 @@ jeux/tri/               une machine
 jeux/anagrammes/        une machine
 jeux/sillage/           une machine
 jeux/echo/              une machine
+jeux/fonderie/          une machine
 ```
 
 Chaque jeu charge `css/arcade.css` puis sa propre feuille, qui redéfinit
@@ -279,6 +280,39 @@ l'envers**.
 | Recommencer | `R` | bouton « Nouvelle partie » |
 | Couper le son | `M` | bouton « Son » |
 
+### Fonderie · habillage en acier
+
+Le client commande un alliage de **quatre doses** tirées d'un jeu de métaux. On
+coule un essai, le laboratoire rend son rapport : combien de doses sont du bon
+métal **à la bonne place**, combien sont du bon métal **mal placé**. On
+recommence jusqu'à trouver la recette, ou jusqu'à épuiser les huit essais.
+
+- C'est un Mastermind, et le décor n'est pas un habillage : **un rapport
+  d'essai est littéralement ce retour-là**, quand des pions colorés n'en sont
+  qu'une convention.
+- Le cœur du jeu est le calcul du rapport, et c'est là que le genre se casse :
+  sur les doses en double. Il se fait en **deux passes** — les doses à leur
+  place d'abord, les autres piochent dans ce qui reste. Sans ça, un essai à
+  deux doses de cuivre contre une cible qui n'en a qu'une en compterait deux.
+- Points d'une commande : `(9 − essais utilisés) × 10`. Trouver en quatre
+  essais vaut 50, en huit vaut 10.
+- Le vivier s'élargit : cinq métaux à la première commande, six à la deuxième,
+  sept ensuite. Manquer une commande termine la série.
+- Chaque métal porte un **glyphe** (▲ ● ■ ◆ ★ ✚ ⬢) et un nom : la teinte n'est
+  jamais le seul moyen de distinguer deux doses.
+- Comme Tri, cette machine n'a **pas de couleur à elle** — Tri prend le registre
+  chaud (os), Fonderie le registre froid (acier) — pour que les seules teintes
+  franches de l'écran soient celles des métaux qu'on doit deviner.
+- Le record est le **meilleur score** d'une série.
+
+| Action | Clavier | Tactile / souris |
+| --- | --- | --- |
+| Ajouter une dose | `1` à `7` | toucher un métal |
+| Retirer une dose | `Retour arrière` | toucher la dose dans le creuset |
+| Couler l'essai | `Entrée` | bouton « Couler l'essai » |
+| Recommencer | `R` | bouton « Nouvelle série » |
+| Couper le son | `M` | bouton « Son » |
+
 ## Ce que le socle fournit
 
 - **Le son**, entièrement synthétisé avec l'API Web Audio : aucun fichier audio
@@ -293,6 +327,11 @@ l'envers**.
   statistiques. Chaque accès est protégé : un navigateur qui refuse le stockage
   fait perdre la sauvegarde, pas la partie.
 - **Le réglage du son**, commun à toute la collection : coupé ici, coupé partout.
+- **La règle `[hidden] { display: none !important; }`**, posée une fois pour
+  toutes. Sans elle, tout `display: flex` ou `grid` d'une feuille de jeu
+  l'emporte sur le `display: none` par défaut du navigateur et l'élément reste
+  visible. Le piège avait été rustiné douze fois, machine par machine, avant
+  d'être corrigé à sa racine.
 - **Le châssis** : rails, tableau de bord, jauge, pastilles de vies, écran de
   fin, boutons. Un composant remonte dans le socle dès qu'une deuxième machine
   s'en sert — les pastilles de vies y sont passées quand Écho a rejoint

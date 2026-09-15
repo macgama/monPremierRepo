@@ -41,6 +41,11 @@
 
 * { box-sizing: border-box; }
 
+/* Un élément porteur de l'attribut hidden doit disparaître, point. Sans cette
+   règle, tout display: flex ou grid posé par une feuille de jeu l'emporte sur
+   le display: none par défaut du navigateur, et l'élément reste visible. */
+[hidden] { display: none !important; }
+
 html { height: 100%; }
 
 body {
@@ -286,7 +291,6 @@ body {
   background: rgba(9, 21, 24, 0.93);
   animation: fade 260ms ease-out;
 }
-.over[hidden] { display: none; }
 
 @keyframes fade { from { opacity: 0; } }
 

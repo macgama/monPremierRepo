@@ -245,7 +245,6 @@
   place-items: center;
   pointer-events: none;
 }
-.combo[hidden] { display: none; }
 
 .combo span {
   font-family: Bungee, Archivo, sans-serif;

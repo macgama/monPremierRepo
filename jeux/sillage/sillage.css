@@ -45,7 +45,6 @@
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
   animation: surgir 160ms ease-out;
 }
-.annonce[hidden] { display: none; }
 
 @keyframes surgir { from { opacity: 0; transform: translate(-50%, -6px); } }
 
@@ -64,7 +63,6 @@
   text-align: center;
   background: rgba(8, 13, 18, 0.88);
 }
-.pret[hidden] { display: none; }
 
 .pret-titre {
   margin: 0;
