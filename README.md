@@ -15,6 +15,7 @@ jeux/stack/             une machine
 jeux/mot/               une machine
 jeux/rebond/            une machine
 jeux/tri/               une machine
+jeux/anagrammes/        une machine
 ```
 
 Chaque jeu charge `css/arcade.css` puis sa propre feuille, qui redéfinit
@@ -173,6 +174,47 @@ chaque tube est vide, ou plein d'une seule couleur.
 | Recommencer le niveau | — | bouton « Recommencer » |
 | Couper le son | `M` | bouton « Son » |
 
+### Anagrammes · accent violet
+
+Sept lettres tirées d'un mot, quatre-vingt-dix secondes, le plus de mots
+français possible. Chaque lettre du tirage ne sert qu'une fois par mot.
+
+- Points : 3 lettres → 1, 4 → 2, 5 → 4, 6 → 7, 7 → 12. La courbe est
+  volontairement raide : chercher un mot long paie plus que de ratisser les
+  petits.
+- Le tirage vient toujours d'un **vrai mot de sept lettres**, ce qui garantit
+  un tirage riche — et donne au joueur quelque chose à viser.
+- **Les solutions sont précalculées, grille par grille.** Le jeu n'embarque
+  aucun dictionnaire complet : valider un mot revient à interroger un ensemble
+  de quelques dizaines d'entrées. C'est ce qui ramène les données à 46 Ko au
+  lieu des centaines de kilo-octets qu'aurait coûté un dictionnaire de 3 à 7
+  lettres.
+- Le record est le **meilleur score**.
+
+| Action | Clavier | Tactile / souris |
+| --- | --- | --- |
+| Composer | les lettres | toucher les jetons |
+| Valider | `Entrée` | bouton « Valider » |
+| Effacer | `Retour arrière` | bouton « ⌫ » |
+| Vider la ligne | `Échap` | — |
+| Mélanger le tirage | `Espace` | bouton « ⇄ » |
+
+#### Les grilles
+
+`jeux/anagrammes/grilles.js` contient 230 tirages. Chaque ligne est une grille :
+le premier mot est celui de sept lettres, les suivants sont tous les mots de
+trois à sept lettres qu'on peut en tirer, du plus long au plus court.
+
+- Vivier de 5 990 formes françaises retenues par fréquence, **plus sévèrement
+  sur les mots courts** : les mots de trois lettres sont les plus bruités dans
+  les sources (`BEU`, `KOI`, `ZEB`), donc seuls les 150 plus fréquents sont
+  gardés, relus un à un pour en retirer prénoms, anglicismes et vulgarités.
+- Deux mots de base anagrammes l'un de l'autre donneraient le même tirage :
+  `SERPENT` et `PRESENT`, `TRAINER` et `TERRAIN`… 25 doublons ont été retirés.
+- Score maximal médian d'une grille : 107 points, pour 34 mots trouvables.
+
+Sources : mêmes que Le Mot du Jour.
+
 ## Ce que le socle fournit
 
 - **Le son**, entièrement synthétisé avec l'API Web Audio : aucun fichier audio
@@ -199,6 +241,11 @@ et les effets décoratifs (étincelles, ondes, secousses, débris) disparaissent
   transitions CSS dont la durée est calculée selon la distance de chute. Les
   fusions sont trouvées par remplissage par diffusion sur les valeurs
   identiques, ce qui gère les groupes de trois tuiles et plus.
+- **Anagrammes** vide la ligne de saisie **immédiatement** quand un mot est
+  refusé, jamais après une temporisation : un vidage programmé pour plus tard
+  avalait les lettres tapées entre-temps, et on tape vite dans ce jeu. Ses
+  messages s'affichent dans la ligne de saisie et non à la place du chrono,
+  qu'il ne faut jamais masquer.
 - **Tri** dessine en DOM, comme Chute : une bille est un `div` positionné en
   `transform: translate()`, et un versement est une suite de trois transitions
   enchaînées (monter, franchir, descendre) décalées de 55 ms d'une bille à
