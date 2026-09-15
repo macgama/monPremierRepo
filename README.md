@@ -22,6 +22,7 @@ jeux/fonderie/          une machine
 jeux/quitte/            une machine
 jeux/ricochet/          une machine
 jeux/intrus/            une machine
+jeux/cadence/           une machine
 ```
 
 Chaque jeu charge `css/arcade.css` puis sa propre feuille, qui redéfinit
@@ -421,6 +422,35 @@ Une grille de pastilles identiques, sauf une. La trouver avant le sablier.
 | Action | Clavier | Tactile / souris |
 | --- | --- | --- |
 | Désigner | — | toucher la pastille |
+| Recommencer | `R` | bouton « Nouvelle partie » |
+| Couper le son | `M` | bouton « Son » |
+
+### Cadence · accent sarcelle
+
+Quatre voies, des notes qui descendent, une ligne de frappe. La batterie donne
+le pouls ; la mélodie, c'est le joueur qui la joue — chaque voie a sa note.
+
+- **Une seule horloge, celle du son.** La position d'une note à l'écran et le
+  jugement d'une frappe se calculent tous deux depuis
+  `AudioContext.currentTime`. L'horloge des images ne sert qu'à décider quand
+  redessiner, jamais à dater quoi que ce soit. Mesurée en conditions de test,
+  la dérive entre les deux horloges allait de **−0,9 ms à −21 ms sur six
+  secondes** selon la charge : de quoi transformer une frappe juste en frappe
+  ratée si on datait sur la mauvaise.
+- La batterie est **planifiée en avance à des instants absolus** du contexte
+  audio, et les notes portent ces mêmes instants : ce qu'on entend et ce qu'on
+  voit descendent du même nombre.
+- Fenêtres de jugement : 45 ms pour un parfait, 90 ms pour un bien, 150 ms pour
+  un passable.
+- Le seuil de survie se lit dans les nombres : à −5 de justesse par note
+  manquée et +2 par parfaite, il faut en toucher **un peu plus de sept sur
+  dix** pour se maintenir. Un premier réglage à −9 en exigeait plus de huit sur
+  dix, ce qui ne laissait pas le temps d'apprendre les voies.
+- Frapper dans le vide coûte de la justesse : le martèlement ne paie pas.
+
+| Action | Clavier | Tactile / souris |
+| --- | --- | --- |
+| Frapper une voie | `D` `F` `J` `K`, ou les flèches | toucher la voie |
 | Recommencer | `R` | bouton « Nouvelle partie » |
 | Couper le son | `M` | bouton « Son » |
 
