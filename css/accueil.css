@@ -44,6 +44,7 @@
 .card--tri    { --accent: #ddd3bd; }
 .card--ana    { --accent: #a082e8; }
 .card--sillage { --accent: #e8c33a; }
+.card--echo   { --accent: #4d7ff0; }
 
 .card-body { display: grid; gap: 4px; }
 
@@ -255,6 +256,33 @@
 @keyframes miniRode {
   from { transform: translate(0, 0); }
   to   { transform: translate(-28px, 34px); }
+}
+
+/* Écho : neuf touches, trois qui s'allument à rebours. */
+.art--echo i {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  background: #1b2a4a;
+}
+.art--echo .e1 { left: 10px; bottom: 44px; }
+.art--echo .e2 { left: 30px; bottom: 44px; }
+.art--echo .e3 { left: 50px; bottom: 44px; }
+.art--echo .e4 { left: 10px; bottom: 24px; }
+.art--echo .e5 { left: 30px; bottom: 24px; }
+.art--echo .e6 { left: 50px; bottom: 24px; }
+.art--echo .e7 { left: 10px; bottom: 4px; }
+.art--echo .e8 { left: 30px; bottom: 4px; }
+.art--echo .e9 { left: 50px; bottom: 4px; }
+
+.art--echo .e3 { animation: miniEcho 2.7s ease-in-out infinite; }
+.art--echo .e5 { animation: miniEcho 2.7s ease-in-out infinite 0.5s; }
+.art--echo .e7 { animation: miniEcho 2.7s ease-in-out infinite 1s; }
+
+@keyframes miniEcho {
+  0%, 100% { background: #1b2a4a; }
+  8%       { background: #6d9bff; box-shadow: 0 0 10px rgba(109, 155, 255, 0.9); }
+  26%      { background: #1b2a4a; box-shadow: none; }
 }
 
 /* ---------- L'atelier ---------- */

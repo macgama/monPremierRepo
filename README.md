@@ -17,6 +17,7 @@ jeux/rebond/            une machine
 jeux/tri/               une machine
 jeux/anagrammes/        une machine
 jeux/sillage/           une machine
+jeux/echo/              une machine
 ```
 
 Chaque jeu charge `css/arcade.css` puis sa propre feuille, qui redéfinit
@@ -248,6 +249,36 @@ le sillage avant le retour, une vie est perdue.
 Le demi-tour est interdit tant qu'on est dehors : on se couperait son propre
 sillage.
 
+### Écho · accent bleu
+
+La machine joue une suite de touches et de notes. Il faut la rejouer **à
+l'envers**.
+
+- C'est toute la différence avec un Simon : à l'endroit, on peut répondre au
+  fur et à mesure et la mémoire n'est jamais sollicitée d'un bloc. À l'envers,
+  il faut avoir retenu la suite entière avant de poser le premier doigt.
+- Chaque réussite ajoute une touche **à la fin** de la suite montrée, donc au
+  **début** de la réponse. La difficulté monte là où la mémoire est la plus
+  fraîche, ce qui rend la progression plus douce qu'il n'y paraît.
+- Les neuf touches vont du grave, en bas à gauche, à l'aigu, en haut à droite.
+  La hauteur se lit surtout à la clarté ; la teinte ne bouge que de 24 degrés
+  (229° → 204°), pour que les neuf touches restent visiblement le même
+  instrument. Les notes suivent une **pentatonique majeure** : n'importe quelle
+  suite sonne juste.
+- La cadence se resserre avec la longueur, de 640 ms à 300 ms par touche.
+- Une erreur coûte une vie et **la même suite est rejouée** : on n'est jamais
+  renvoyé au début pour un doigt qui a glissé. Trois vies.
+- Une suite complète est rejouée à l'endroit, vite, en récompense — c'est
+  l'écho qui revient.
+- Le record est la **plus longue suite rejouée à l'envers**.
+
+| Action | Clavier | Tactile / souris |
+| --- | --- | --- |
+| Jouer une touche | pavé numérique `1`-`9` | toucher la case |
+| Commencer | `Espace` | toucher l'écran |
+| Recommencer | `R` | bouton « Nouvelle partie » |
+| Couper le son | `M` | bouton « Son » |
+
 ## Ce que le socle fournit
 
 - **Le son**, entièrement synthétisé avec l'API Web Audio : aucun fichier audio
@@ -262,7 +293,10 @@ sillage.
   statistiques. Chaque accès est protégé : un navigateur qui refuse le stockage
   fait perdre la sauvegarde, pas la partie.
 - **Le réglage du son**, commun à toute la collection : coupé ici, coupé partout.
-- **Le châssis** : rails, tableau de bord, jauge, écran de fin, boutons.
+- **Le châssis** : rails, tableau de bord, jauge, pastilles de vies, écran de
+  fin, boutons. Un composant remonte dans le socle dès qu'une deuxième machine
+  s'en sert — les pastilles de vies y sont passées quand Écho a rejoint
+  Sillage.
 
 `prefers-reduced-motion` est respecté partout : les durées tombent à une frame
 et les effets décoratifs (étincelles, ondes, secousses, débris) disparaissent.
@@ -274,6 +308,11 @@ et les effets décoratifs (étincelles, ondes, secousses, débris) disparaissent
   transitions CSS dont la durée est calculée selon la distance de chute. Les
   fusions sont trouvées par remplissage par diffusion sur les valeurs
   identiques, ce qui gère les groupes de trois tuiles et plus.
+- **Écho** fait démarrer la partie depuis son **voile d'attente**, pas depuis
+  la grille : le voile recouvre les touches et capte les clics, si bien que
+  « touchez une case pour commencer » ne déclenchait rien. Les machines à toile
+  n'ont pas ce piège, leur écouteur étant posé sur le conteneur que le voile
+  recouvre.
 - **Sillage** nomme sa bulle de message `.annonce` et surtout pas `.flash` :
   le socle réserve cette classe à l'animation du score, et les deux se sont
   effectivement écrasées — le score disparaissait de sa tuile pour aller
