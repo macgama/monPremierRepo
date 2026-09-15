@@ -14,6 +14,7 @@ jeux/chute/             une machine
 jeux/stack/             une machine
 jeux/mot/               une machine
 jeux/rebond/            une machine
+jeux/tri/               une machine
 ```
 
 Chaque jeu charge `css/arcade.css` puis sa propre feuille, qui redéfinit
@@ -136,6 +137,42 @@ face du trou au moment d'atteindre la barre.
 La partie ne démarre qu'au premier appui : on a le temps de lire le puits avant
 de tomber.
 
+### Tri · habillage en os
+
+Des billes de couleur réparties dans des tubes. On verse la série du dessus d'un
+tube vers un autre, si celui-ci est vide ou montre la même couleur. Gagné quand
+chaque tube est vide, ou plein d'une seule couleur.
+
+- **Chaque niveau est vérifié solvable avant d'être servi.** Le tirage est
+  entièrement aléatoire, puis un parcours en profondeur avec mémoire des
+  positions déjà vues confirme qu'une solution existe ; sinon on retire. Le
+  joueur ne peut jamais s'acharner sur un mélange impossible.
+- La première tentative mélangeait *à l'envers* depuis l'état résolu, ce qui
+  garantit la solvabilité sans solveur. Mesuré, c'était nettement moins bon :
+  un tube était déjà pur au départ une fois sur deux (0,52 contre 0,01) et les
+  solutions étaient 40 % plus courtes (13 coups contre 22, à sept couleurs).
+  Le tirage plein filtré par le solveur a remplacé cette approche.
+- Le solveur coûte **204 nœuds au pire sur 2 400 tirages**, soit 2 ms : assez
+  peu pour tourner à chaque génération de niveau.
+- Deux paliers : jusqu'au niveau 12, le nombre de couleurs monte de 3 à 7 avec
+  **deux tubes libres** ; à partir du niveau 13, il n'y en a plus qu'**un** et le
+  nombre de couleurs repart de 5. Un tirage à un seul tube libre n'est solvable
+  qu'une fois sur onze environ — d'où l'insistance de la boucle de génération,
+  qui desserre d'un tube en dernier recours.
+- **Annuler** est illimité : une erreur ne doit pas coûter le niveau entier.
+- Chaque couleur porte un **glyphe** (● ▲ ■ ◆ ★ ✚ ⬢) : la teinte n'est jamais le
+  seul moyen de distinguer deux billes. Et cette machine n'a pas de couleur
+  d'accent à elle — son habillage est en os, pour que les seules couleurs
+  saturées de l'écran soient celles qu'on doit ranger.
+- Le record est le **niveau le plus haut rangé**.
+
+| Action | Clavier | Tactile / souris |
+| --- | --- | --- |
+| Prendre / verser | `Entrée` sur un tube | toucher un tube, puis un autre |
+| Annuler | — | bouton « Annuler » |
+| Recommencer le niveau | — | bouton « Recommencer » |
+| Couper le son | `M` | bouton « Son » |
+
 ## Ce que le socle fournit
 
 - **Le son**, entièrement synthétisé avec l'API Web Audio : aucun fichier audio
@@ -162,6 +199,12 @@ et les effets décoratifs (étincelles, ondes, secousses, débris) disparaissent
   transitions CSS dont la durée est calculée selon la distance de chute. Les
   fusions sont trouvées par remplissage par diffusion sur les valeurs
   identiques, ce qui gère les groupes de trois tuiles et plus.
+- **Tri** dessine en DOM, comme Chute : une bille est un `div` positionné en
+  `transform: translate()`, et un versement est une suite de trois transitions
+  enchaînées (monter, franchir, descendre) décalées de 55 ms d'une bille à
+  l'autre. Le diamètre est **mesuré sur une bille rendue**, jamais relu dans la
+  feuille de style : `--bille` vaut `clamp(27px, 8.4vw, 36px)` et
+  `getPropertyValue` rend la formule telle quelle, pas la valeur résolue.
 - **Le Mot du Jour** n'anime que des classes CSS : la révélation d'une ligne est
   une suite de retournements décalés, déclenchés par minuterie.
 - **Rebond** dessine lui aussi sur une toile, et borne le pas de temps à 33 ms :

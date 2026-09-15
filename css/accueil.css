@@ -41,6 +41,7 @@
 .card--stack { --accent: #4fd8e8; }
 .card--mot   { --accent: #7bc47f; }
 .card--rebond { --accent: #ff4d8d; }
+.card--tri    { --accent: #ddd3bd; }
 
 .card-body { display: grid; gap: 4px; }
 
@@ -150,6 +151,36 @@
   0%   { transform: translate(0, 0); opacity: 0; }
   12%  { opacity: 1; }
   100% { transform: translate(28px, 46px); opacity: 1; }
+}
+
+/* Tri : trois tubes, et une bille qui rejoint sa couleur. */
+.art--tri .g1, .art--tri .g2, .art--tri .g3 {
+  width: 18px;
+  height: 44px;
+  bottom: 10px;
+  border: 1px solid var(--rail);
+  border-top: 0;
+  border-radius: 2px 2px 7px 7px;
+}
+.art--tri .g1 { left: 10px; }
+.art--tri .g2 { left: 29px; }
+.art--tri .g3 { left: 48px; }
+
+.art--tri .t1, .art--tri .t2, .art--tri .t3, .art--tri .t4, .art--tri .t5 {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+.art--tri .t1 { left: 12px; bottom: 12px; background: #e0574f; }
+.art--tri .t2 { left: 12px; bottom: 27px; background: #e0574f; }
+.art--tri .t3 { left: 31px; bottom: 12px; background: #5b7fd4; }
+.art--tri .t4 { left: 50px; bottom: 12px; background: #5b7fd4; }
+.art--tri .t5 { left: 31px; bottom: 27px; background: #5b7fd4; animation: miniHop 2.6s ease-in-out infinite; }
+
+@keyframes miniHop {
+  0%, 12%   { transform: translate(0, 0); }
+  50%       { transform: translate(9px, -16px); }
+  84%, 100% { transform: translate(19px, 0); }
 }
 
 /* ---------- L'atelier ---------- */
