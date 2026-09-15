@@ -39,7 +39,7 @@
     pretTitre: document.getElementById('pretTitre'),
     pretTexte: document.getElementById('pretTexte'),
     pretAide: document.getElementById('pretAide'),
-    flash: document.getElementById('flash'),
+    annonce: document.getElementById('annonce'),
     over: document.getElementById('over'),
     overKicker: document.getElementById('overKicker'),
     overScore: document.getElementById('overScore'),
@@ -191,10 +191,10 @@
   }
 
   function flasher(texte) {
-    el.flash.textContent = texte;
-    el.flash.hidden = false;
+    el.annonce.textContent = texte;
+    el.annonce.hidden = false;
     clearTimeout(flasher.t);
-    flasher.t = setTimeout(() => { el.flash.hidden = true; }, 1500);
+    flasher.t = setTimeout(() => { el.annonce.hidden = true; }, 1500);
   }
 
   /* ---------- pas du joueur ---------- */

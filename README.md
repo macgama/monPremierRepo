@@ -274,6 +274,11 @@ et les effets décoratifs (étincelles, ondes, secousses, débris) disparaissent
   transitions CSS dont la durée est calculée selon la distance de chute. Les
   fusions sont trouvées par remplissage par diffusion sur les valeurs
   identiques, ce qui gère les groupes de trois tuiles et plus.
+- **Sillage** nomme sa bulle de message `.annonce` et surtout pas `.flash` :
+  le socle réserve cette classe à l'animation du score, et les deux se sont
+  effectivement écrasées — le score disparaissait de sa tuile pour aller
+  flotter en haut de la page. Une feuille de jeu ne réutilise jamais un nom de
+  classe du socle pour autre chose.
 - **Sillage** garde le terrain dans un `Uint8Array` de trois états (vide, terre,
   sillage) et le redessine case par case à chaque image. Le remplissage est un
   parcours en largeur amorcé depuis chaque rôdeur ; si la case d'un rôdeur est

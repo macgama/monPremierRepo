@@ -48,8 +48,10 @@
 .pad--croix { gap: 6px; }
 .pad--croix .btn { flex: 1; font-size: 17px; }
 
-/* Message bref : sans lui, une zone non conquise passe pour un bug. */
-.flash {
+/* Message bref : sans lui, une zone non conquise passe pour un bug.
+   Surtout pas nommé .flash : le socle réserve cette classe à l'animation
+   du score, et les deux se seraient écrasées. */
+.annonce {
   position: absolute;
   left: 50%;
   top: 12px;
@@ -65,7 +67,7 @@
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
   animation: surgir 160ms ease-out;
 }
-.flash[hidden] { display: none; }
+.annonce[hidden] { display: none; }
 
 @keyframes surgir { from { opacity: 0; transform: translate(-50%, -6px); } }
 
