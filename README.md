@@ -20,6 +20,7 @@ jeux/sillage/           une machine
 jeux/echo/              une machine
 jeux/fonderie/          une machine
 jeux/quitte/            une machine
+jeux/ricochet/          une machine
 ```
 
 Chaque jeu charge `css/arcade.css` puis sa propre feuille, qui redéfinit
@@ -361,6 +362,37 @@ restantes : sans la seconde information, la première induit en erreur.
 | Descendre d'un palier | `↓`, `Espace` | bouton « Descendre » |
 | Remonter et encaisser | `↑`, `Entrée` | bouton « Remonter » |
 | Recommencer | `R` | bouton « Nouvelle série » |
+| Couper le son | `M` | bouton « Son » |
+
+### Ricochet · accent anis
+
+On tire la bille en fronde ; elle rebondit sur les parois et les blocs, et
+**traverse les cibles sans dévier** — un seul tir bien placé peut en ramasser
+plusieurs. Autant de tirs que de cibles, un de moins passé le niveau 10, et
+chaque tir épargné vaut 60 points.
+
+- **La simulation tourne en unités fixes (320 × 430) et au pas fixe de 1/60 s**,
+  quelle que soit la taille de l'écran. La trajectoire jouée est donc exactement
+  celle qui a servi à vérifier le niveau — sans quoi la garantie ne vaudrait
+  rien. La toile est mise à l'échelle au rendu, jamais la physique.
+- **Un niveau n'est servi qu'une fois vérifié.** Chaque cible doit être
+  atteignable par au moins un tir d'un balayage de 630 tirs. Et quand les tirs
+  sont moins nombreux que les cibles, il faut en plus qu'un tir en ramasse deux :
+  ce tir, plus un par cible restante, tient alors dans le budget. C'est ce qui
+  rend la faisabilité **démontrable** plutôt que probable.
+- Que les cibles ne dévient pas la bille n'est pas qu'un choix de confort :
+  c'est ce qui rend la vérification décidable, puisque la trajectoire d'un tir
+  ne dépend pas des cibles déjà ramassées.
+- Mesuré : un niveau servi par tirage, en 20 ms environ, et **un tir au hasard
+  touche une cible donnée 10 % du temps** — la visée compte sans que la cible
+  soit une aiguille. Rebonds moyens : 1,8 au niveau 1, 3,1 au niveau 14.
+- L'aperçu s'arrête au **premier rebond**. Au-delà, c'est au joueur de voir
+  venir.
+
+| Action | Clavier | Tactile / souris |
+| --- | --- | --- |
+| Viser et tirer | — | tirer en arrière puis relâcher |
+| Recommencer | `R` | bouton « Nouvelle partie » |
 | Couper le son | `M` | bouton « Son » |
 
 ## Ce que le socle fournit
