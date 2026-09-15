@@ -19,6 +19,7 @@ jeux/anagrammes/        une machine
 jeux/sillage/           une machine
 jeux/echo/              une machine
 jeux/fonderie/          une machine
+jeux/quitte/            une machine
 ```
 
 Chaque jeu charge `css/arcade.css` puis sa propre feuille, qui redéfinit
@@ -310,6 +311,55 @@ recommence jusqu'à trouver la recette, ou jusqu'à épuiser les huit essais.
 | Ajouter une dose | `1` à `7` | toucher un métal |
 | Retirer une dose | `Retour arrière` | toucher la dose dans le creuset |
 | Couler l'essai | `Entrée` | bouton « Couler l'essai » |
+| Recommencer | `R` | bouton « Nouvelle série » |
+| Couper le son | `M` | bouton « Son » |
+
+### Quitte · accent rouge braise
+
+Cinq descentes. À chaque palier on tire une carte du puits : un **filon**
+grossit la sacoche, un **grondement** arme son danger. Le **deuxième**
+grondement d'un même danger fait s'effondrer la galerie — et met fin à la
+**série entière**. Remonter met la sacoche à l'abri et ouvre la descente
+suivante.
+
+Le paquet compte 15 filons (de 1 à 17) et 4 dangers en 3 exemplaires. Le risque
+affiché est **exact** : c'est le nombre de cartes mortelles restantes divisé par
+le nombre de cartes restantes, et le tableau de bord montre les deux.
+
+#### Le réglage vient d'une simulation faite avant l'interface
+
+Deux versions ont été écrites, mesurées et **jetées** :
+
+| Version | Ce que rapporte la lecture du puits |
+| --- | --- |
+| Effondrement = sacoche perdue, cinq descentes indépendantes | **+3 %** sur une règle aveugle |
+| Idem, mais paquet persistant sur la série | **+6 %**, et *en retrait* au 99ᵉ centile |
+| **Effondrement = série perdue** | **+15 %**, et +34 points d'écart avec la lecture naïve |
+
+Les deux premières étaient des machines à sous : un joueur qui remonte
+mécaniquement au palier 6, sans jamais regarder le puits, jouait à 3 % du
+joueur attentif. La cause est structurelle — un effondrement ne coûtait que la
+sacoche du moment, trop peu face au total d'une série.
+
+La troisième version tient parce que le coût du risque devient **ce qu'on
+sacrifie des descentes à venir**, donc un coût qui fond à mesure que la série
+avance : prudent au début, gourmand à la fin. Trois faits mesurés :
+
+- Les règles aveugles imposent un vrai dilemme : « palier 4 partout » donne la
+  meilleure moyenne (55,9) mais « palier 7 partout » donne une **médiane de 0**
+  et le meilleur 99ᵉ centile (197). Consistance contre record.
+- **Ne lire que le risque immédiat est un piège actif : −19 %.** Le joueur qui
+  oublie les descentes restantes joue moins bien qu'un automate.
+- Lire le risque **et** ce qu'un effondrement ferait perdre : +15 %, et robuste
+  (diviser ou doubler l'estimation ne coûte que 5 %).
+
+C'est pourquoi le tableau de bord affiche le risque **et** les descentes
+restantes : sans la seconde information, la première induit en erreur.
+
+| Action | Clavier | Tactile / souris |
+| --- | --- | --- |
+| Descendre d'un palier | `↓`, `Espace` | bouton « Descendre » |
+| Remonter et encaisser | `↑`, `Entrée` | bouton « Remonter » |
 | Recommencer | `R` | bouton « Nouvelle série » |
 | Couper le son | `M` | bouton « Son » |
 

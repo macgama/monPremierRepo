@@ -46,6 +46,7 @@
 .card--sillage { --accent: #e8c33a; }
 .card--echo   { --accent: #4d7ff0; }
 .card--fonderie { --accent: #9fb0bd; }
+.card--quitte  { --accent: #c9453f; }
 
 .card-body { display: grid; gap: 4px; }
 
@@ -310,6 +311,35 @@
 @keyframes miniEssai {
   0%, 55%, 100% { background: #5b7fd4; }
   65%, 90%      { background: #c8763c; }
+}
+
+/* Quitte : la lampe descend le long du puits, le danger attend en bas. */
+.art--quitte .q0 { left: 37px; top: 8px; width: 2px; height: 56px; background: var(--rail); }
+.art--quitte .q1, .art--quitte .q2, .art--quitte .q3 {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #e8c33a;
+  left: 22px;
+}
+.art--quitte .q1 { top: 16px; }
+.art--quitte .q2 { top: 30px; }
+.art--quitte .q3 { top: 44px; opacity: 0.35; }
+.art--quitte .q4 {
+  left: 30px;
+  top: 8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff3cf;
+  box-shadow: 0 0 12px rgba(232, 195, 58, 0.9);
+  animation: miniDescend 2.8s ease-in-out infinite;
+}
+
+@keyframes miniDescend {
+  0%, 8%    { transform: translateY(0); background: #fff3cf; }
+  62%       { transform: translateY(34px); background: #fff3cf; }
+  74%, 100% { transform: translateY(44px); background: #c9453f; box-shadow: 0 0 14px rgba(201, 69, 63, 0.9); }
 }
 
 /* ---------- L'atelier ---------- */
