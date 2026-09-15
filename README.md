@@ -16,6 +16,7 @@ jeux/mot/               une machine
 jeux/rebond/            une machine
 jeux/tri/               une machine
 jeux/anagrammes/        une machine
+jeux/sillage/           une machine
 ```
 
 Chaque jeu charge `css/arcade.css` puis sa propre feuille, qui redéfinit
@@ -215,6 +216,38 @@ trois à sept lettres qu'on peut en tirer, du plus long au plus court.
 
 Sources : mêmes que Le Mot du Jour.
 
+### Sillage · accent or
+
+On part de son territoire, on trace un sillage dans le vide, on revient : ce
+qu'on referme devient à soi. Des rôdeurs patrouillent le vide ; s'ils touchent
+le sillage avant le retour, une vie est perdue.
+
+- **La règle de remplissage tient en une phrase :** après un retour, toute
+  région du vide où ne se trouve aucun rôdeur est conquise. C'est elle qui rend
+  les grandes boucles payantes, et qui interdit d'enfermer un rôdeur pour rien.
+  Elle est vérifiée par un test sur des terrains construits à la main : rôdeur
+  à droite, à gauche, un de chaque côté, et un rôdeur pile sur le sillage.
+- Une prise d'au moins 60 cases en une seule boucle **vaut double** : c'est le
+  pari du jeu, sortir loin plutôt que grignoter.
+- Le premier niveau ne compte **qu'un seul rôdeur** : il doit enseigner la
+  règle, pas la faire subir. Ensuite, un rôdeur de plus tous les deux niveaux
+  jusqu'à cinq, et tout le monde accélère.
+- Objectif : 70 % du terrain. Trois vies pour la partie entière ; mourir efface
+  le sillage en cours mais garde le territoire.
+- Quand une zone refermée contient un rôdeur, **le jeu le dit**. Sans ce
+  message, ne rien gagner passe pour une panne.
+- Le record est le **meilleur score**.
+
+| Action | Clavier | Tactile / souris |
+| --- | --- | --- |
+| Diriger | flèches, `ZQSD` | glisser sur le terrain, ou la croix |
+| Démarrer | `Espace` | toucher le terrain |
+| Recommencer | `R` | bouton « Nouvelle partie » |
+| Couper le son | `M` | bouton « Son » |
+
+Le demi-tour est interdit tant qu'on est dehors : on se couperait son propre
+sillage.
+
 ## Ce que le socle fournit
 
 - **Le son**, entièrement synthétisé avec l'API Web Audio : aucun fichier audio
@@ -241,6 +274,11 @@ et les effets décoratifs (étincelles, ondes, secousses, débris) disparaissent
   transitions CSS dont la durée est calculée selon la distance de chute. Les
   fusions sont trouvées par remplissage par diffusion sur les valeurs
   identiques, ce qui gère les groupes de trois tuiles et plus.
+- **Sillage** garde le terrain dans un `Uint8Array` de trois états (vide, terre,
+  sillage) et le redessine case par case à chaque image. Le remplissage est un
+  parcours en largeur amorcé depuis chaque rôdeur ; si la case d'un rôdeur est
+  devenue terre au pixel près, l'amorce se reporte sur ses voisines, sans quoi
+  il serait emmuré et sa région absorbée.
 - **Anagrammes** vide la ligne de saisie **immédiatement** quand un mot est
   refusé, jamais après une temporisation : un vidage programmé pour plus tard
   avalait les lettres tapées entre-temps, et on tape vite dans ce jeu. Ses
