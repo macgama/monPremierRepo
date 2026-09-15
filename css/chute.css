@@ -225,13 +225,16 @@ body {
 }
 
 .guide i {
+  /* Repère de la case où la tuile va se poser. */
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0;
-  height: 3px;
-  background: var(--signal);
-  box-shadow: 0 0 10px rgba(255, 90, 43, 0.7);
+  top: 0;
+  height: var(--cell);
+  border: 2px dashed rgba(255, 90, 43, 0.8);
+  border-radius: 3px;
+  box-shadow: inset 0 0 14px rgba(255, 90, 43, 0.25);
+  transition: transform 110ms cubic-bezier(0.2, 0.8, 0.3, 1), opacity 110ms ease;
 }
 
 .guide.blocked {
@@ -239,7 +242,7 @@ body {
   border-color: rgba(125, 155, 161, 0.3);
   animation: nope 220ms ease-in-out;
 }
-.guide.blocked i { background: var(--dim); box-shadow: none; }
+.guide.blocked i { opacity: 0; }
 
 @keyframes nope {
   25% { transform: translateX(calc(var(--gx) - 5px)); }
@@ -316,6 +319,18 @@ body {
 
 .tile.held { z-index: 3; }
 .tile.pop  { animation: pop 260ms cubic-bezier(0.3, 1.6, 0.5, 1); z-index: 2; }
+
+.tile.pop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+  background: #fff;
+  animation: blanch 280ms ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes blanch { from { opacity: 0.7; } to { opacity: 0; } }
 .tile.land { animation: land 180ms ease-out; }
 
 @keyframes pop {
@@ -463,7 +478,131 @@ kbd {
 }
 .ghost:hover { color: var(--bone); border-color: var(--bone); }
 
+/* ---------- Jauge de montée ---------- */
+
+.meter {
+  width: 100%;
+  max-width: calc(var(--grid-w) + 2 * 18px);
+  display: grid;
+  gap: 5px;
+}
+
+.meter-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.meter-track {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--rail);
+  overflow: hidden;
+}
+
+.meter-track i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--rail-2);
+  transition: width 220ms ease-out, background 220ms ease;
+}
+
+.meter.hot .meter-track i { background: var(--signal); }
+.meter.hot .meter-head { animation: alarm 1s ease-in-out infinite; }
+.meter.hot #meterLeft { color: var(--signal); }
+
+/* ---------- Effets de fusion ---------- */
+
+.ring {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--cell);
+  height: var(--cell);
+  border: 2px solid var(--t1);
+  border-radius: 6px;
+  z-index: 4;
+  pointer-events: none;
+  animation: ring 440ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+
+@keyframes ring {
+  from { transform: var(--tf) scale(0.62); opacity: 0.85; }
+  to   { transform: var(--tf) scale(2.1); opacity: 0; }
+}
+
+.spark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  z-index: 4;
+  pointer-events: none;
+  animation: spark 520ms cubic-bezier(0.15, 0.7, 0.35, 1) forwards;
+}
+
+@keyframes spark {
+  from { transform: var(--tf) translate(0, 0) scale(1); opacity: 1; }
+  to   { transform: var(--tf) translate(var(--dx), var(--dy)) scale(0.15); opacity: 0; }
+}
+
+.tile.fresh { animation: fresh 300ms ease-out; }
+
+@keyframes fresh {
+  from { filter: brightness(1.8); }
+  to   { filter: none; }
+}
+
+.stage { --amp: 2px; }
+.stage.shake { animation: shake 280ms ease-in-out; }
+
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0); }
+  20%  { transform: translate(calc(var(--amp) * -1), calc(var(--amp) * 0.4)); }
+  45%  { transform: translate(var(--amp), calc(var(--amp) * -0.5)); }
+  70%  { transform: translate(calc(var(--amp) * -0.6), 0); }
+}
+
+.combo {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.combo[hidden] { display: none; }
+
+.combo span {
+  font-family: Bungee, Archivo, sans-serif;
+  font-size: clamp(20px, 6vw, 26px);
+  letter-spacing: 0.06em;
+  color: var(--bone);
+  text-shadow: 0 0 22px rgba(255, 90, 43, 0.9), 0 3px 10px rgba(0, 0, 0, 0.8);
+  animation: cascade 780ms cubic-bezier(0.2, 1.4, 0.4, 1) forwards;
+}
+
+@keyframes cascade {
+  0%   { opacity: 0; transform: scale(0.6); }
+  22%  { opacity: 1; transform: scale(1.08); }
+  70%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1) translateY(-14px); }
+}
+
+/* ---------- Pied ---------- */
+
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .tile, .guide { transition-duration: 1ms !important; }
-  .tile.pop, .tile.land, .float, .playfield.danger::before { animation-duration: 1ms; }
+  .tile.pop, .tile.land, .tile.fresh, .float, .playfield.danger::before,
+  .ring, .spark, .stage.shake, .combo span, .meter.hot .meter-head { animation-duration: 1ms; }
 }

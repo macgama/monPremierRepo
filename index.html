@@ -33,12 +33,21 @@
     </div>
   </section>
 
+  <div class="meter" id="meter">
+    <div class="meter-head">
+      <span class="lab" id="meterLab">Montée · palier 1</span>
+      <span class="lab" id="meterLeft">14 coups</span>
+    </div>
+    <div class="meter-track"><i id="meterFill"></i></div>
+  </div>
+
   <div class="stage">
     <div class="rail" aria-hidden="true"></div>
     <div class="playfield" id="playfield">
       <div class="guide" id="guide" aria-hidden="true"><i></i></div>
       <div class="grid" id="cells" aria-hidden="true"></div>
       <div class="layer" id="tiles"></div>
+      <div class="combo" id="combo" hidden></div>
       <div class="over" id="over" hidden>
         <p class="over-kicker">Chute bouchée</p>
         <p class="over-score" id="overScore">0</p>
@@ -55,8 +64,12 @@
     <button class="btn" id="right" type="button" aria-label="Colonne de droite">▶</button>
   </div>
 
-  <p class="help">Flèches ou <kbd>A</kbd>/<kbd>D</kbd> pour viser · <kbd>Espace</kbd> pour lâcher · ou touchez une colonne</p>
-  <button class="ghost" id="restart" type="button">Nouvelle partie</button>
+  <p class="help">Flèches ou <kbd>A</kbd>/<kbd>D</kbd> pour viser · <kbd>Espace</kbd> pour lâcher · ou touchez une colonne. Tous les
+    quelques coups, une rangée pousse par le bas.</p>
+  <div class="foot">
+    <button class="ghost" id="restart" type="button">Nouvelle partie</button>
+    <button class="ghost" id="mute" type="button" aria-pressed="false">Son : actif</button>
+  </div>
 
 </main>
 <script src="js/chute.js"></script>

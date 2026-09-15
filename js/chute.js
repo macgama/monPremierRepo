@@ -1,16 +1,18 @@
 /* Chute — moteur de jeu.
-   Grille 5 x 8. On vise une colonne, on lâche une tuile, elle tombe.
+   Grille 5 x 7. On vise une colonne, on lâche une tuile, elle tombe.
    Toute tuile identique et adjacente fusionne, la gravité reprend,
-   et les cascades s'enchaînent avec un multiplicateur de combo. */
+   et les cascades s'enchaînent avec un multiplicateur de combo.
+   Tous les N coups, une rangée pousse par le bas : c'est l'horloge. */
 
 (() => {
   'use strict';
 
   const COLS = 5;
-  const ROWS = 8;
+  const ROWS = 7;
   const GAP = 8;
   const MAX_CELL = 66;
   const STORE_KEY = 'chute.record';
+  const MUTE_KEY = 'chute.muet';
 
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const ms = (n) => (reduced ? 1 : n);
@@ -19,13 +21,20 @@
   const el = {
     root: document.documentElement,
     cabinet: document.querySelector('.cabinet'),
+    stage: document.querySelector('.stage'),
     playfield: document.getElementById('playfield'),
     cells: document.getElementById('cells'),
     layer: document.getElementById('tiles'),
     guide: document.getElementById('guide'),
+    combo: document.getElementById('combo'),
     score: document.getElementById('score'),
     best: document.getElementById('best'),
     next: document.getElementById('next'),
+    meter: document.getElementById('meter'),
+    meterLab: document.getElementById('meterLab'),
+    meterLeft: document.getElementById('meterLeft'),
+    meterFill: document.getElementById('meterFill'),
+    mute: document.getElementById('mute'),
     over: document.getElementById('over'),
     overScore: document.getElementById('overScore'),
     overNote: document.getElementById('overNote'),
@@ -40,8 +49,72 @@
   let score = 0;
   let best = 0;
   let peak = 2;         // plus haute valeur atteinte
+  let drops = 0;        // coups joués depuis la dernière montée
+  let level = 0;        // nombre de montées déjà encaissées
   let busy = false;
   let over = false;
+  let comboTimer = 0;
+
+  /* ---------- son ---------- */
+  /* Tout est synthétisé à la volée : aucun fichier audio à charger. */
+
+  const sound = { ctx: null, on: true };
+
+  function bootAudio() {
+    if (sound.ctx) {
+      if (sound.ctx.state === 'suspended') sound.ctx.resume();
+      return;
+    }
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (AC) sound.ctx = new AC();
+  }
+
+  function tone({ freq, to, dur, type = 'triangle', vol = 0.16, delay = 0 }) {
+    if (!sound.on || !sound.ctx) return;
+    const ctx = sound.ctx;
+    const t0 = ctx.currentTime + delay;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, t0);
+    if (to) osc.frequency.exponentialRampToValueAtTime(to, t0 + dur);
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.exponentialRampToValueAtTime(vol, t0 + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(t0);
+    osc.stop(t0 + dur + 0.03);
+  }
+
+  // Échelle majeure étendue : chaque maillon de cascade monte d'un degré.
+  const LADDER = [0, 4, 7, 12, 16, 19, 24, 28, 31, 36];
+
+  const sfx = {
+    aim:  () => tone({ freq: 880, dur: 0.025, type: 'sine', vol: 0.03 }),
+    land: () => tone({ freq: 190, to: 90, dur: 0.09, type: 'square', vol: 0.07 }),
+    merge(combo) {
+      const semi = LADDER[Math.min(combo, LADDER.length) - 1];
+      const f = 330 * Math.pow(2, semi / 12);
+      tone({ freq: f, to: f * 1.5, dur: 0.16, type: 'triangle', vol: 0.15 });
+      tone({ freq: f / 2, dur: 0.2, type: 'sine', vol: 0.09 });
+    },
+    push: () => {
+      tone({ freq: 120, to: 44, dur: 0.34, type: 'sawtooth', vol: 0.13 });
+      tone({ freq: 240, to: 150, dur: 0.18, type: 'square', vol: 0.05 });
+    },
+    nope: () => tone({ freq: 150, to: 110, dur: 0.1, type: 'square', vol: 0.06 }),
+    over: () => {
+      [440, 349, 262, 196].forEach((f, i) =>
+        tone({ freq: f, dur: 0.3, type: 'triangle', vol: 0.13, delay: i * 0.13 }));
+    },
+  };
+
+  function setMuted(muted) {
+    sound.on = !muted;
+    el.mute.textContent = muted ? 'Son : coupé' : 'Son : actif';
+    el.mute.setAttribute('aria-pressed', String(muted));
+    try { localStorage.setItem(MUTE_KEY, muted ? '1' : '0'); } catch (e) { /* indisponible */ }
+  }
 
   /* ---------- géométrie ---------- */
 
@@ -63,6 +136,7 @@
     for (const t of allTiles()) place(t, 0);
     if (held) place(held, 0);
     moveGuide(0);
+    if (board.length) updateLanding();
   }
 
   const x = (col) => col * (cell + GAP);
@@ -112,19 +186,27 @@
 
   /* ---------- pioche ---------- */
 
+  /* La fenêtre de tirage glisse vers le haut avec la partie : le plafond monte
+     pour suivre la progression, et le plancher finit par retirer les petites
+     valeurs, qui sinon encombreraient le plateau jusqu'à la fin. */
+  function pool() {
+    const ceiling = Math.max(4, Math.min(64, peak / 4));
+    const floor = Math.max(2, Math.min(8, peak / 64));
+    const out = [];
+    for (let v = floor; v <= ceiling; v *= 2) out.push(v);
+    return out.length ? out : [2];
+  }
+
   function roll() {
-    // Le sommet de la pioche suit la progression, sans jamais dépasser 32.
-    const ceiling = Math.max(4, Math.min(32, peak / 8));
-    const pool = [];
-    for (let v = 2; v <= ceiling; v *= 2) pool.push(v);
-    const weights = pool.map((_, i) => Math.pow(0.5, i));
+    const values = pool();
+    const weights = values.map((_, i) => Math.pow(0.5, i));
     const total = weights.reduce((a, b) => a + b, 0);
     let pick = Math.random() * total;
-    for (let i = 0; i < pool.length; i++) {
+    for (let i = 0; i < values.length; i++) {
       pick -= weights[i];
-      if (pick <= 0) return pool[i];
+      if (pick <= 0) return values[i];
     }
-    return pool[0];
+    return values[0];
   }
 
   function spawn() {
@@ -184,10 +266,17 @@
       dress(anchor.el, value);
       restart(anchor.el, 'pop');
 
+      shockwave(anchor);
+      sparks(anchor, 4 + group.length * 2);
+
       const points = value * (group.length - 1) * combo;
       gained += points;
       floatText(anchor, points, combo);
     }
+
+    sfx.merge(combo);
+    shake(combo);
+    banner(combo);
 
     score += gained;
     el.score.textContent = score;
@@ -240,6 +329,46 @@
     }
   }
 
+  /* ---------- la montée ---------- */
+
+  const pushEvery = () => Math.max(8, 14 - level);
+
+  async function pushRow() {
+    if (board[0].some(Boolean)) {   // une colonne touche déjà le plafond
+      finish('écrasé par la montée');
+      return;
+    }
+    sfx.push();
+    shake(3);
+
+    for (let r = 1; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const t = board[r][c];
+        if (!t) continue;
+        board[r - 1][c] = t;
+        board[r][c] = null;
+        t.row = r - 1;
+        place(t, 240, 'cubic-bezier(.3,.9,.3,1)');
+      }
+    }
+
+    const low = pool();
+    for (let c = 0; c < COLS; c++) {
+      const value = Math.random() < 0.72 ? low[0] : (low[1] ?? low[0]);
+      const t = makeTile(value, ROWS, c);      // sous le cadre, hors champ
+      t.el.classList.add('fresh');
+      void t.el.offsetWidth;                   // fige la position de départ
+      t.row = ROWS - 1;
+      board[ROWS - 1][c] = t;
+      place(t, 240, 'cubic-bezier(.3,.9,.3,1)');
+    }
+
+    level++;
+    drops = 0;
+    await wait(280);
+    await resolve(null);
+  }
+
   /* ---------- effets ---------- */
 
   function restart(node, cls) {
@@ -249,13 +378,81 @@
     node.classList.add(cls);
   }
 
+  function shockwave(t) {
+    if (reduced) return;
+    const ring = document.createElement('div');
+    ring.className = 'ring';
+    ring.style.setProperty('--tf', `translate(${x(t.col)}px, ${y(t.row)}px)`);
+    ring.style.borderColor = `var(--t${tier(t.value)})`;
+    el.layer.appendChild(ring);
+    setTimeout(() => ring.remove(), 480);
+  }
+
+  function sparks(t, count) {
+    if (reduced) return;
+    const color = `var(--t${tier(t.value)})`;
+    const cx = x(t.col) + cell / 2 - 3;
+    const cy = y(t.row) + cell / 2 - 3;
+    for (let i = 0; i < count; i++) {
+      const s = document.createElement('div');
+      s.className = 'spark';
+      const angle = (Math.PI * 2 * i) / count + Math.random() * 0.6;
+      const dist = cell * (0.5 + Math.random() * 0.55);
+      s.style.setProperty('--tf', `translate(${cx}px, ${cy}px)`);
+      s.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+      s.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+      s.style.background = color;
+      el.layer.appendChild(s);
+      setTimeout(() => s.remove(), 560);
+    }
+  }
+
+  function shake(strength) {
+    if (reduced) return;
+    el.stage.style.setProperty('--amp', Math.min(strength, 5) * 1.5 + 'px');
+    el.stage.classList.remove('shake');
+    void el.stage.offsetWidth;
+    el.stage.classList.add('shake');
+  }
+
+  function banner(combo) {
+    if (combo < 2) return;
+    el.combo.innerHTML = `<span>Cascade ×${combo}</span>`;
+    el.combo.hidden = false;
+    clearTimeout(comboTimer);
+    comboTimer = setTimeout(() => { el.combo.hidden = true; }, ms(780));
+  }
+
   function floatText(t, points, combo) {
     const node = document.createElement('div');
     node.className = 'float';
     node.style.setProperty('--tf', `translate(${x(t.col)}px, ${y(t.row)}px)`);
-    node.innerHTML = combo > 1 ? `+${points} <b>x${combo}</b>` : `+${points}`;
+    node.innerHTML = combo > 1 ? `+${points} <b>×${combo}</b>` : `+${points}`;
     el.layer.appendChild(node);
     setTimeout(() => node.remove(), ms(720));
+  }
+
+  function updateMeter() {
+    const need = pushEvery();
+    const left = Math.max(0, need - drops);
+    el.meterLab.textContent = `Montée · palier ${level + 1}`;
+    el.meterLeft.textContent = left <= 1 ? 'coup suivant' : `${left} coups`;
+    el.meterFill.style.width = Math.min(100, (drops / need) * 100) + '%';
+    el.meter.classList.toggle('hot', left <= 2);
+  }
+
+  /* Le repère d'atterrissage : la case libre la plus basse de la colonne visée. */
+  function updateLanding() {
+    const mark = el.guide.firstElementChild;
+    let r = ROWS - 1;
+    while (r >= 0 && board[r][aim]) r--;
+    if (r < 0) { mark.style.opacity = '0'; return; }
+    mark.style.opacity = '1';
+    mark.style.transform = `translateY(${cell + GAP + y(r)}px)`;
+  }
+
+  function markDanger() {
+    el.playfield.classList.toggle('danger', board[0].some(Boolean));
   }
 
   /* ---------- tour de jeu ---------- */
@@ -267,17 +464,20 @@
     if (next === aim) return;
     aim = next;
     moveGuide(110);
+    sfx.aim();
     if (held) {
       held.col = aim;
       place(held, 110, 'cubic-bezier(.2,.8,.3,1)');
     }
     el.guide.classList.toggle('blocked', columnFull(aim));
+    updateLanding();
   }
 
   async function drop() {
     if (busy || over || !held) return;
     if (columnFull(aim)) {
       restart(el.guide, 'blocked');
+      sfx.nope();
       return;
     }
     busy = true;
@@ -295,31 +495,41 @@
     place(t, fall, 'cubic-bezier(.45,.05,.6,.35)');
     await wait(fall + 20);
     restart(t.el, 'land');
+    sfx.land();
 
     await resolve(t);
 
-    el.playfield.classList.toggle('danger', board[0].some(Boolean));
+    drops++;
+    if (!over && drops >= pushEvery()) await pushRow();
 
-    if (board[0].every(Boolean)) {
-      finish();
-    } else {
-      spawn();
-      el.guide.classList.toggle('blocked', columnFull(aim));
+    updateMeter();
+    markDanger();
+    updateLanding();
+
+    if (!over) {
+      if (board[0].every(Boolean)) finish('les cinq colonnes sont pleines');
+      else {
+        spawn();
+        el.guide.classList.toggle('blocked', columnFull(aim));
+      }
     }
     busy = false;
   }
 
-  function finish() {
+  function finish(reason) {
+    if (over) return;
     over = true;
+    sfx.over();
     el.overScore.textContent = score;
-    el.overNote.textContent = `Plus haute tuile : ${peak}` + (score >= best ? ' · nouveau record' : '');
+    el.overNote.textContent =
+      `${reason} · plus haute tuile : ${peak}` + (score >= best && score > 0 ? ' · nouveau record' : '');
     el.over.hidden = false;
   }
 
   /* ---------- persistance ---------- */
 
   function save() {
-    try { localStorage.setItem(STORE_KEY, String(best)); } catch (e) { /* stockage indisponible */ }
+    try { localStorage.setItem(STORE_KEY, String(best)); } catch (e) { /* indisponible */ }
   }
 
   function load() {
@@ -337,10 +547,12 @@
     score = state?.score ?? 0;
     peak = state?.peak ?? 2;
     aim = state?.aim ?? Math.floor(COLS / 2);
-    queued = state?.queued ?? 2;
+    drops = state?.drops ?? 0;
+    level = state?.level ?? 0;
     over = false;
     busy = false;
     held = null;
+    el.combo.hidden = true;
 
     best = Math.max(load(), state?.best ?? 0, score);
     el.score.textContent = score;
@@ -360,14 +572,16 @@
       queued = state.queued;
       dress(el.next, queued);
     }
-    el.playfield.classList.toggle('danger', board[0].some(Boolean));
-    if (board[0].every(Boolean)) finish();
+
+    updateMeter();
+    markDanger();
+    updateLanding();
+    if (board[0].every(Boolean)) finish('les cinq colonnes sont pleines');
   }
 
   function snapshot() {
     return {
-      score, peak, aim, best,
-      queued,
+      score, peak, aim, best, drops, level, queued,
       held: held ? held.value : null,
       cells: [...allTiles()].map((t) => ({ row: t.row, col: t.col, value: t.value })),
     };
@@ -376,11 +590,13 @@
   /* ---------- entrées ---------- */
 
   addEventListener('keydown', (e) => {
+    bootAudio();
     const k = e.key.toLowerCase();
     if (k === 'arrowleft' || k === 'a' || k === 'q') { setAim(aim - 1); e.preventDefault(); }
     else if (k === 'arrowright' || k === 'd') { setAim(aim + 1); e.preventDefault(); }
     else if (k === ' ' || k === 'arrowdown' || k === 's' || k === 'enter') { drop(); e.preventDefault(); }
     else if (k === 'r') { reset(); }
+    else if (k === 'm') { setMuted(sound.on); }
   });
 
   const colFromEvent = (e) => {
@@ -390,6 +606,7 @@
 
   let pointing = false;
   el.playfield.addEventListener('pointerdown', (e) => {
+    bootAudio();
     if (over) return;
     pointing = true;
     el.playfield.setPointerCapture(e.pointerId);
@@ -405,13 +622,18 @@
   });
   el.playfield.addEventListener('pointercancel', () => { pointing = false; });
 
-  document.getElementById('left').addEventListener('click', () => setAim(aim - 1));
-  document.getElementById('right').addEventListener('click', () => setAim(aim + 1));
-  document.getElementById('drop').addEventListener('click', drop);
+  document.getElementById('left').addEventListener('click', () => { bootAudio(); setAim(aim - 1); });
+  document.getElementById('right').addEventListener('click', () => { bootAudio(); setAim(aim + 1); });
+  document.getElementById('drop').addEventListener('click', () => { bootAudio(); drop(); });
   document.getElementById('restart').addEventListener('click', () => reset());
   document.getElementById('again').addEventListener('click', () => reset());
+  el.mute.addEventListener('click', () => { bootAudio(); setMuted(sound.on); });
 
   addEventListener('resize', layout);
+
+  let wasMuted = false;
+  try { wasMuted = localStorage.getItem(MUTE_KEY) === '1'; } catch (e) { /* indisponible */ }
+  setMuted(wasMuted);
 
   /* Reprise d'état quand la page est republiée sous les yeux d'un joueur. */
   const hot = window.claude?.hot;
