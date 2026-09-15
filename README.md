@@ -13,6 +13,7 @@ js/accueil.js           le hall
 jeux/chute/             une machine
 jeux/stack/             une machine
 jeux/mot/               une machine
+jeux/rebond/            une machine
 ```
 
 Chaque jeu charge `css/arcade.css` puis sa propre feuille, qui redéfinit
@@ -107,6 +108,34 @@ et [Taknok/French-Wordlist](https://github.com/Taknok/French-Wordlist) pour les
 formes, [hermitdave/FrequencyWords](https://github.com/hermitdave/FrequencyWords)
 (OpenSubtitles 2018) pour le classement par fréquence.
 
+### Rebond · accent magenta
+
+Une chute libre dans un puits. La bille tombe seule et rebondit sur les parois ;
+le seul pouvoir du joueur est d'inverser son sens horizontal. Il faut être en
+face du trou au moment d'atteindre la barre.
+
+- Le réglage qui décide de tout est la **vitesse latérale**. À 1,55 fois la
+  vitesse de chute, la bille traversait tout le puits entre deux barres : le
+  joueur ne pouvait que subir les rebonds. À **0,62 fois**, elle parcourt six
+  dixièmes de l'écart entre deux barres, de quoi viser sans pouvoir flâner.
+- Les trous se décalent d'au plus **0,45 fois l'écart** d'une barre à l'autre,
+  soit moins que le déplacement possible dans l'intervalle : aucun passage
+  n'est impossible, et il reste de la marge pour se raviser. La première barre
+  est toujours en face du départ.
+- La difficulté ne vient donc jamais d'un tirage injouable, mais du trou qui
+  rétrécit (118 px → 54) et du temps de réaction qui fond (la chute passe de
+  190 à 430 px/s).
+- Le record est la **profondeur en mètres**, un mètre valant dix pixels.
+
+| Action | Clavier | Tactile / souris |
+| --- | --- | --- |
+| Inverser le sens | `Espace`, `Entrée`, `←` `→` | toucher le puits, ou « Inverser » |
+| Recommencer | `R` | bouton « Nouvelle partie » |
+| Couper le son | `M` | bouton « Son » |
+
+La partie ne démarre qu'au premier appui : on a le temps de lire le puits avant
+de tomber.
+
 ## Ce que le socle fournit
 
 - **Le son**, entièrement synthétisé avec l'API Web Audio : aucun fichier audio
@@ -135,6 +164,8 @@ et les effets décoratifs (étincelles, ondes, secousses, débris) disparaissent
   identiques, ce qui gère les groupes de trois tuiles et plus.
 - **Le Mot du Jour** n'anime que des classes CSS : la révélation d'une ligne est
   une suite de retournements décalés, déclenchés par minuterie.
+- **Rebond** dessine lui aussi sur une toile, et borne le pas de temps à 33 ms :
+  au-delà, la bille pourrait franchir une barre sans que la collision soit vue.
 - **Stack** dessine sur une toile `canvas` : le ciel, les étoiles, la tour et
   les débris y sont peints à chaque frame. La tour est stockée en pixels et
   remise à l'échelle au redimensionnement.

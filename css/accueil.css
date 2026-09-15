@@ -40,6 +40,7 @@
 .card--chute { --accent: #ff5a2b; }
 .card--stack { --accent: #4fd8e8; }
 .card--mot   { --accent: #7bc47f; }
+.card--rebond { --accent: #ff4d8d; }
 
 .card-body { display: grid; gap: 4px; }
 
@@ -126,6 +127,29 @@
 @keyframes miniFlip {
   0%, 58%, 100% { transform: scaleY(1); }
   68%           { transform: scaleY(0.08); }
+}
+
+/* Rebond : deux barres percées, et la bille qui se faufile. */
+.art--rebond i { height: 5px; background: #ff4d8d; }
+.art--rebond .r1 { left: 6px;  bottom: 48px; width: 12px; }
+.art--rebond .r2 { left: 30px; bottom: 48px; width: 40px; }
+.art--rebond .r3 { left: 6px;  bottom: 24px; width: 40px; }
+.art--rebond .r4 { left: 58px; bottom: 24px; width: 12px; }
+.art--rebond .r5 {
+  left: 19px;
+  bottom: 60px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ffe8f1;
+  box-shadow: 0 0 8px rgba(255, 77, 141, 0.9);
+  animation: miniFall 2.2s linear infinite;
+}
+
+@keyframes miniFall {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  12%  { opacity: 1; }
+  100% { transform: translate(28px, 46px); opacity: 1; }
 }
 
 /* ---------- L'atelier ---------- */
