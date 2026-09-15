@@ -48,6 +48,7 @@
 .card--fonderie { --accent: #9fb0bd; }
 .card--quitte  { --accent: #c9453f; }
 .card--ricochet { --accent: #9ed13f; }
+.card--intrus  { --accent: #dd6ad0; }
 
 .card-body { display: grid; gap: 4px; }
 
@@ -368,6 +369,23 @@
   0%, 6%    { transform: translate(0, 0); }
   42%       { transform: translate(10px, -14px); }
   78%, 100% { transform: translate(38px, 4px); }
+}
+
+/* Intrus : neuf pastilles, une qui pivote. */
+.art--intrus i { width: 15px; height: 15px; border-radius: 3px; background: #5a4a5e; }
+.art--intrus .i1 { left: 11px; top: 11px; }
+.art--intrus .i2 { left: 31px; top: 11px; }
+.art--intrus .i3 { left: 51px; top: 11px; }
+.art--intrus .i4 { left: 11px; top: 31px; }
+.art--intrus .i5 { left: 31px; top: 31px; }
+.art--intrus .i6 { left: 51px; top: 31px; }
+.art--intrus .i7 { left: 11px; top: 51px; }
+.art--intrus .i8 { left: 31px; top: 51px; animation: miniIntrus 3s ease-in-out infinite; }
+.art--intrus .i9 { left: 51px; top: 51px; }
+
+@keyframes miniIntrus {
+  0%, 30%, 100% { transform: rotate(0deg); background: #5a4a5e; }
+  55%, 80%      { transform: rotate(24deg); background: #8a6a90; }
 }
 
 /* ---------- L'atelier ---------- */

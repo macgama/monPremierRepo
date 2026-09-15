@@ -21,6 +21,7 @@ jeux/echo/              une machine
 jeux/fonderie/          une machine
 jeux/quitte/            une machine
 jeux/ricochet/          une machine
+jeux/intrus/            une machine
 ```
 
 Chaque jeu charge `css/arcade.css` puis sa propre feuille, qui redéfinit
@@ -392,6 +393,34 @@ chaque tir épargné vaut 60 points.
 | Action | Clavier | Tactile / souris |
 | --- | --- | --- |
 | Viser et tirer | — | tirer en arrière puis relâcher |
+| Recommencer | `R` | bouton « Nouvelle partie » |
+| Couper le son | `M` | bouton « Son » |
+
+### Intrus · accent fuchsia
+
+Une grille de pastilles identiques, sauf une. La trouver avant le sablier.
+
+- **La différence change de nature d'une manche à l'autre** : teinte, clarté,
+  pivot, taille, décalage. Ce n'est pas un caprice — une différence seulement
+  colorée exclurait du jeu ceux qui distinguent mal les teintes. Ici la couleur
+  n'est qu'une possibilité sur cinq.
+- L'écart fond d'environ 9 % par manche jusqu'à un **plancher atteint vers la
+  manche 15** ; au-delà, seuls le sablier et la taille de la grille se
+  resserrent. Le jeu durcit sans fin mais ne devient jamais imperceptible.
+- Les natures géométriques sont exprimées **en pixels rendus**, pas en
+  pourcentage de la pastille. Une première version les exprimait en
+  pourcentage : mesurée sur le rendu, elle descendait à **0,6 px de décalage**
+  en grille 6 × 6, c'est-à-dire invisible, sans que le réglage l'annonce. La
+  grille est donc bâtie en deux passes : toutes les pastilles identiques, on
+  mesure celle qui est rendue, puis on applique l'écart dans la bonne unité.
+- Le pivot lui-même est ramené au **déplacement d'un coin en pixels**, puis
+  reconverti en degrés selon la taille réelle de la pastille.
+- Après une erreur, l'intrus est désigné et sa nature annoncée : c'est comme ça
+  que l'œil apprend.
+
+| Action | Clavier | Tactile / souris |
+| --- | --- | --- |
+| Désigner | — | toucher la pastille |
 | Recommencer | `R` | bouton « Nouvelle partie » |
 | Couper le son | `M` | bouton « Son » |
 
