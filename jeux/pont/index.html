@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pont — Machines</title>
+<meta name="description" content="Des îles numérotées, des ponts droits : tout relier sans jamais deviner.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Bungee&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../../css/arcade.css">
+<link rel="stylesheet" href="pont.css">
+</head>
+<body>
+<main class="cabinet">
+
+  <nav class="topbar"><a class="back" href="../../index.html">‹ Toutes les machines</a></nav>
+
+  <header class="head">
+    <h1 class="mark">Pont</h1>
+    <p class="tag">Sans jamais deviner</p>
+  </header>
+
+  <section class="readout" aria-label="Tableau de bord">
+    <div class="stat">
+      <span class="lab">Score</span>
+      <b class="val" id="score" aria-live="polite">0</b>
+    </div>
+    <div class="stat" id="fautesStat">
+      <span class="lab">Fautes</span>
+      <b class="val" id="fautes">6</b>
+    </div>
+    <div class="stat">
+      <span class="lab">Record</span>
+      <b class="val" id="best">0</b>
+    </div>
+  </section>
+
+  <div class="meter" id="meter">
+    <div class="meter-head">
+      <span class="lab" id="meterLab">Niveau 1 · 6 îles</span>
+      <span class="lab meter-left" id="restants">0 pont à poser</span>
+    </div>
+    <div class="meter-track"><i id="jauge" style="width:0"></i></div>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="rail" aria-hidden="true"></div>
+    <div class="screen screen--pont">
+      <svg id="carte" class="carte" role="application" aria-label="Les îles et les ponts"></svg>
+      <p class="annonce" id="annonce" hidden></p>
+
+      <div class="pret" id="pret">
+        <p class="pret-titre">Sans jamais deviner</p>
+        <p>Le nombre d'une île est le nombre de ponts qui s'y rattachent. <b>Deux
+          ponts au plus</b> entre deux îles, aucun croisement, et tout doit tenir
+          en <b>un seul réseau</b>.</p>
+        <p>Touchez deux îles voisines — ou le pont lui-même — pour passer de zéro
+          à un, puis à deux, puis à rien.</p>
+        <p>Chaque grille est fabriquée pour être <b>résoluble par déduction seule</b> :
+          si vous hésitez, c'est qu'il reste quelque chose à lire.</p>
+        <p class="lab pulse">Touchez l'écran pour commencer</p>
+      </div>
+
+      <div class="over" id="over" hidden>
+        <p class="over-kicker">Réserve épuisée</p>
+        <p class="over-score" id="overScore">0</p>
+        <p class="over-note" id="overNote">points</p>
+        <button class="btn btn--main" id="rejouer" type="button">Rejouer</button>
+      </div>
+    </div>
+    <div class="rail" aria-hidden="true"></div>
+  </div>
+
+  <p class="help">Un pont qui n'est pas dans la solution coûte une faute — et il y en a
+    toujours une à trouver ailleurs, sans hypothèse. Chaque grille résolue en rend deux.</p>
+
+  <div class="foot">
+    <button class="ghost" id="vider" type="button">Tout enlever</button>
+    <button class="ghost" id="restart" type="button">Nouvelle partie</button>
+    <button class="ghost" id="mute" type="button" aria-pressed="false">Son : actif</button>
+  </div>
+
+</main>
+<script src="../../js/arcade.js"></script>
+<script src="pont.js"></script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+/* Pont — les îles et les travées.
+   À charger après css/arcade.css. */
+
+:root {
+  --signal:      #cf82f0;
+  --signal-deep: #5f2a75;
+  --panel-w:     400px;
+}
+
+.stage { width: 100%; max-width: var(--panel-w); }
+
+.screen--pont {
+  position: relative;
+  flex: 1;
+  display: grid;
+  grid-template-rows: 1fr 26px;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  min-height: 320px;
+  border-radius: 3px;
+}
+
+.carte {
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: manipulation;
+}
+
+/* ---------- les travées ---------- */
+
+.pont .trait {
+  stroke: transparent;
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke 140ms ease;
+}
+/* Un pont simple passe par l'axe, un pont double par les deux rails écartés. */
+.pont.un .t0 { stroke: var(--signal); stroke-width: 7; }
+.pont.deux .t1, .pont.deux .t2 { stroke: var(--signal); }
+
+.pont.montre.un .t0,
+.pont.montre.deux .t1,
+.pont.montre.deux .t2 {
+  stroke: var(--bone);
+  stroke-dasharray: 10 8;
+  animation: respire 1.8s ease-in-out infinite;
+}
+
+@keyframes respire { 50% { opacity: 0.35; } }
+
+/* La zone de prise, large et invisible. */
+.prise {
+  stroke: transparent;
+  stroke-width: 30;
+  cursor: pointer;
+}
+
+/* ---------- les îles ---------- */
+
+.ile circle {
+  fill: #14313a;
+  stroke: var(--rail-2);
+  stroke-width: 3;
+  cursor: pointer;
+  transition: fill 140ms ease, stroke 140ms ease;
+}
+
+.ile text {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-weight: 600;
+  font-size: 34px;
+  fill: var(--bone);
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Une île dont le compte est atteint s'efface : ce qui reste à faire ressort. */
+.ile.pleine circle { fill: #10262c; stroke: #2b565e; }
+.ile.pleine text { fill: var(--dim); }
+
+.ile.choisie circle {
+  fill: var(--signal-deep);
+  stroke: var(--signal);
+  stroke-width: 4;
+}
+.ile.voisine circle { stroke: var(--signal); stroke-dasharray: 6 5; }
+
+.ile:focus-visible circle { outline: none; stroke: var(--bone); stroke-width: 4; }
+
+.ile.boucle circle { animation: boucleIle 700ms ease-out; }
+
+@keyframes boucleIle {
+  0%   { fill: var(--signal); stroke: #fff; }
+  100% { fill: #10262c; stroke: #2b565e; }
+}
+
+/* ---------- messages et voiles ---------- */
+
+.stat.maigre .val { color: var(--signal); animation: alarm 1s ease-in-out infinite; }
+
+.annonce {
+  align-self: center;
+  margin: 0;
+  padding: 5px 10px;
+  border-radius: 3px;
+  text-align: center;
+  background: rgba(95, 42, 117, 0.94);
+  box-shadow: inset 0 0 0 1px rgba(207, 130, 240, 0.5);
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--bone);
+  animation: fade 200ms ease-out;
+}
+
+.pret {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  background: rgba(9, 21, 24, 0.95);
+}
+
+.pret-titre {
+  margin: 0;
+  font-family: Bungee, Archivo, sans-serif;
+  font-size: 19px;
+  letter-spacing: 0.08em;
+  color: var(--bone);
+}
+
+.pret p { margin: 0; max-width: 32ch; font-size: 12.5px; line-height: 1.55; color: var(--dim); }
+.pret b { color: var(--signal); font-weight: 600; }
+.pret .pulse { animation: alarm 1.8s ease-in-out infinite; }
+
+.screen--pont .over { background: rgba(9, 21, 24, 0.86); }
+.over-note b { color: var(--signal); font-weight: 700; }

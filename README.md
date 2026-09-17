@@ -30,6 +30,7 @@ jeux/trace/             une machine
 jeux/contraire/         une machine
 jeux/balance/           une machine
 jeux/filature/          une machine
+jeux/pont/              une machine
 ```
 
 Chaque jeu charge `css/arcade.css` puis sa propre feuille, qui redéfinit
@@ -796,6 +797,57 @@ tour, une sortie. Au tour par tour : rien n'est laissé au réflexe.
 | --- | --- | --- |
 | Avancer | flèches | toucher une case voisine |
 | Attendre un tour | `Espace` | bouton « Attendre un tour » |
+| Recommencer | `R` | bouton « Nouvelle partie » |
+| Couper le son | `M` | bouton « Son » |
+
+### Pont · accent orchidée
+
+Hashiwokakero. Le nombre d'une île est le nombre de ponts qui s'y rattachent ;
+deux ponts au plus entre deux îles ; aucun croisement ; et tout doit tenir en un
+seul réseau.
+
+- **La grille est bâtie à l'envers**, comme Réseau et Tracé : on construit le
+  réseau d'abord — donc connexe et sans croisement par construction — et les
+  numéros s'en déduisent. Une solution existe toujours.
+- **Une remarque évite tout un solveur.** Les règles de propagation employées
+  ici — bornes arithmétiques sur chaque île, interdiction de croiser un pont
+  posé — sont des conséquences des contraintes du jeu : elles ne retirent que
+  des valeurs qu'aucune solution ne porte. Si elles déterminent **toutes** les
+  travées, l'assignation obtenue est donc la seule possible ; et comme une
+  solution existe, c'est elle. Autrement dit, *résoluble sans deviner* implique
+  *solution unique*.
+- Cela ne se démontre pas en l'écrivant : **c'est vérifié**. Sur 323 grilles que
+  la propagation résout seule, le solveur exhaustif en trouve 323 à solution
+  unique, et c'est chaque fois celle construite — aucun contre-exemple. La
+  fabrication n'a donc besoin que de la propagation, et une grille coûte **moins
+  d'une milliseconde**. (Au passage : 23 grilles avaient une solution unique sans
+  être résolubles par déduction. Celles-là demandent de deviner, et sont rejetées.)
+- **Le corollaire fait le jeu.** Puisqu'on n'a jamais besoin de deviner, la seule
+  ressource peut être une **réserve de fautes** — un pont posé que la solution ne
+  porte pas. Mesuré sur 800 grilles : le joueur méthodique, qui ne pose que ce
+  que la propagation a déterminé, en dépense **zéro, toujours** ; le joueur qui
+  pose au jugé en dépense de **1 sur six îles à 6 sur dix-huit**, jusqu'à 12. La
+  réserve part de six et chaque grille résolue en rend deux.
+- Croiser un pont posé et dépasser le nombre d'une île sont **refusés, pas
+  facturés** : ce ne sont pas des erreurs de raisonnement, ce sont des coups
+  impossibles.
+- **Le défaut le plus instructif de toute la collection est ici.** Le balayage
+  qui cherche les îles voisines en ligne droite n'était pas borné par la largeur
+  de la grille : en dépassant le bord droit, l'index `y*w + x` retombait sur la
+  rangée suivante et fabriquait des travées **en diagonale** — 828 sur 3 962.
+  Ni le solveur du jeu ni le solveur exhaustif de contrôle ne pouvaient le voir :
+  **ils partageaient la même liste d'arêtes fausse**, et s'accordaient donc
+  parfaitement sur un plateau impossible. C'est une capture d'écran qui l'a
+  montré, en une seconde. Deux vérifications indépendantes ne le sont que si
+  elles ne partagent pas leurs prémisses — et une image reste le seul juge de ce
+  qu'on n'a pas pensé à tester. Le banc vérifie désormais que toute travée est
+  droite et ne saute aucune île.
+
+| Action | Clavier | Tactile / souris |
+| --- | --- | --- |
+| Poser, doubler, enlever | `Entrée` sur deux îles | toucher deux îles voisines, ou la travée |
+| Annuler la sélection | `Échap` | toucher l'île à nouveau |
+| Tout enlever | — | bouton « Tout enlever » |
 | Recommencer | `R` | bouton « Nouvelle partie » |
 | Couper le son | `M` | bouton « Son » |
 
