@@ -26,6 +26,7 @@ jeux/cadence/           une machine
 jeux/fonte/             une machine
 jeux/bascule/           une machine
 jeux/reseau/            une machine
+jeux/trace/             une machine
 ```
 
 Chaque jeu charge `css/arcade.css` puis sa propre feuille, qui redéfinit
@@ -605,6 +606,77 @@ toutes les bouches avant le chrono.
 | Pivoter dans l'autre sens | — | clic droit sur la tuile |
 | Recommencer | `R` | bouton « Nouvelle partie » |
 | Couper le son | `M` | bouton « Son » |
+
+### Tracé · accent rose poudré
+
+Parcourir toute la figure d'un seul geste, sans repasser deux fois sur le même
+trait.
+
+- **C'est le problème des ponts de Königsberg**, et Euler l'a réglé en 1736 : un
+  tel parcours fermé existe si et seulement si la figure est connexe et que tous
+  ses sommets sont de degré pair. La fabrique s'appuie là-dessus au lieu de tirer
+  au hasard puis d'espérer : une figure est une **réunion de cycles sans arête
+  commune, collés entre eux par des sommets**. Chaque cycle laisse tous les
+  degrés pairs, le collage garde la connexité — donc le parcours existe par
+  construction. Mesuré sur 4 800 figures hors ligne puis 240 servies par le jeu
+  lui-même : 100 % sont eulériennes.
+- Un cycle s'obtient comme le **bord d'un groupe de cases** : les arêtes vues une
+  seule fois quand on fait le tour du groupe. C'est ce qui donne aux figures leur
+  air dessiné plutôt que tiré au sort.
+- **La difficulté, c'est le degré 4.** Aux sommets où quatre traits se croisent,
+  il faut choisir, et on peut parfaitement s'enfermer dans une figure
+  parcourable. La marche au hasard le montre, et sert d'échelle : elle réussit
+  **83 % du temps sur une figure de dix arêtes, et 36 % sur une de
+  vingt-quatre**. Les paliers suivent cette chute.
+- **La méthode, elle, ne se trompe jamais** : ne jamais emprunter le dernier
+  trait qui relie deux morceaux de la figure. C'est la règle de Fleury, et sur
+  toutes les figures mesurées elle réussit 100 % du temps — le banc d'essai la
+  joue contre le vrai gestionnaire de clic, niveau après niveau. Elle est donnée
+  dans la ligne d'aide, parce qu'un jeu dont la méthode reste secrète n'est pas
+  difficile, il est fermé.
+- Se coincer coûte une vie et **redonne la même figure**, contrairement à Réseau
+  qui en sert une neuve. La différence est voulue : ici on vient d'apprendre où
+  était le piège, et le rejouer est le seul moment où cette connaissance sert.
+- C'est la seule machine dessinée en **SVG** : des lignes et des cercles, dont
+  l'épaisseur et la couleur se règlent en CSS comme n'importe quel élément.
+
+| Action | Clavier | Tactile / souris |
+| --- | --- | --- |
+| Poser le crayon, avancer | `Entrée` sur un point | toucher un point, ou glisser |
+| Effacer le tracé | `Échap` | bouton « Effacer » |
+| Recommencer | `R` | bouton « Nouvelle partie » |
+| Couper le son | `M` | bouton « Son » |
+
+## Une machine écartée : Mèche
+
+Le projet ne garde pas tout ce qu'il commence. **Mèche** — une grille de charges,
+un seul départ, une cascade qui se propage de charge en charge — a été mesurée
+puis abandonnée, et la raison vaut d'être écrite.
+
+Une cascade est une **accessibilité dans un graphe fixe** : faire sauter un
+groupe de charges n'empêche jamais un autre groupe de sauter plus tard. La
+relation est monotone, et il en découle qu'aucun objectif de comptage ne peut
+créer de décision. Quatre objectifs ont été essayés, et mesurés :
+
+| Objectif | Ce que fait le joueur glouton |
+| --- | --- |
+| Emporter le plus de charges possible | atteint l'optimum **100 %** du temps (1 000 plateaux, de 6×6 à 8×7, de une à trois mèches) |
+| Vider le plateau en *m* mèches | **200 plateaux sur 200** vidés sans réfléchir |
+| Tout emporter sans toucher un baril | gagne **240 fois sur 240** — les barils, posés hors de l'onde du départ voulu, ne gênaient personne |
+| Emporter au moins *k* charges sans toucher un baril | piégé **1 à 9 %** du temps seulement, et les plateaux retombent à cinq départs gagnants ou plus |
+
+Le troisième cas est le plus instructif : la fabrique construisait le plateau à
+l'envers depuis le départ voulu, donc ce départ emportait forcément **toutes**
+les charges — c'était donc forcément lui la plus grosse cascade. Les barils
+étaient décoratifs. Et le quatrième montre pourquoi on ne s'en sort pas : pour
+que la grosse cascade soit un piège, il faut qu'un baril soit sur son chemin
+alors qu'une cascade plus petite atteint encore le seuil, et cette conjonction ne
+se produit presque jamais.
+
+Une mécanique spectaculaire à regarder, sans décision dedans. Ce qui la sauverait
+est un changement de nature, pas de barème : que les charges aient une **capacité**
+et ne sautent qu'au deuxième coup reçu. L'ordre compterait alors vraiment, et la
+monotonie tomberait. C'est un autre jeu, à mesurer depuis le début.
 
 ## Ce que le socle fournit
 

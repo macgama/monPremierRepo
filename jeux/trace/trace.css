@@ -1,0 +1,137 @@
+/* Tracé — la figure à parcourir d'un seul geste.
+   À charger après css/arcade.css. */
+
+:root {
+  --signal:      #ff9ec4;
+  --signal-deep: #8e3a5c;
+  --panel-w:     390px;
+}
+
+.stage { width: 100%; max-width: var(--panel-w); }
+
+.screen--trace {
+  position: relative;
+  flex: 1;
+  display: grid;
+  grid-template-rows: 1fr 26px;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  min-height: 340px;
+  border-radius: 3px;
+}
+
+.figure {
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: none;
+}
+
+/* ---------- les traits ---------- */
+
+.arete {
+  stroke: var(--rail-2);
+  stroke-width: 11;
+  stroke-linecap: round;
+  transition: stroke 160ms ease, stroke-width 160ms ease;
+}
+
+.arete.faite {
+  stroke: var(--signal);
+  stroke-width: 15;
+  filter: drop-shadow(0 0 7px rgba(255, 158, 196, 0.5));
+}
+
+.arete.boucle { animation: boucleTrait 700ms ease-out; }
+
+@keyframes boucleTrait {
+  0%   { stroke: #fff; stroke-width: 19; }
+  100% { stroke: var(--signal); stroke-width: 15; }
+}
+
+/* Les traits qu'on n'a pas pu atteindre, à la fin. */
+.arete.oubliee {
+  stroke: var(--bone);
+  stroke-width: 13;
+  stroke-dasharray: 8 12;
+  animation: respire 1.8s ease-in-out infinite;
+}
+
+@keyframes respire { 50% { opacity: 0.35; } }
+
+/* ---------- les points ---------- */
+
+.sommet {
+  fill: #1a3a42;
+  stroke: var(--rail-2);
+  stroke-width: 3;
+  cursor: pointer;
+  transition: fill 140ms ease, stroke 140ms ease, r 140ms ease;
+}
+.sommet:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+
+/* Avant le premier point, tous sont offerts : on part d'où l'on veut. */
+.sommet.libre { fill: #24505c; stroke: var(--signal-deep); }
+
+/* Là où le crayon se trouve. */
+.sommet.ou {
+  fill: var(--signal);
+  stroke: #fff;
+  r: 24;
+}
+
+/* Les points qu'on peut encore atteindre depuis là. */
+.sommet.offert {
+  fill: var(--signal-deep);
+  stroke: var(--signal);
+}
+
+/* Le point de départ, pour savoir où revenir. */
+.sommet.depart { stroke: var(--bone); stroke-dasharray: 5 4; }
+
+/* ---------- messages et voiles ---------- */
+
+.annonce {
+  align-self: center;
+  margin: 0;
+  padding: 5px 10px;
+  border-radius: 3px;
+  text-align: center;
+  background: rgba(142, 58, 92, 0.92);
+  box-shadow: inset 0 0 0 1px rgba(255, 158, 196, 0.45);
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--bone);
+  animation: fade 200ms ease-out;
+}
+
+.pret {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 22px;
+  text-align: center;
+  cursor: pointer;
+  background: rgba(9, 21, 24, 0.94);
+}
+
+.pret-titre {
+  margin: 0;
+  font-family: Bungee, Archivo, sans-serif;
+  font-size: 19px;
+  letter-spacing: 0.08em;
+  color: var(--bone);
+}
+
+.pret p { margin: 0; max-width: 31ch; font-size: 12.5px; line-height: 1.55; color: var(--dim); }
+.pret b { color: var(--signal); font-weight: 600; }
+.pret .pulse { animation: alarm 1.8s ease-in-out infinite; }
+
+.screen--trace .over { background: rgba(9, 21, 24, 0.84); }
+.over-note b { color: var(--signal); font-weight: 700; }
