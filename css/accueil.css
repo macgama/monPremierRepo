@@ -54,6 +54,7 @@
 .card--bascule { --accent: #8f7bff; }
 .card--reseau  { --accent: #21c97a; }
 .card--trace   { --accent: #ff9ec4; }
+.card--contraire { --accent: #a86dff; }
 
 .card-body { display: grid; gap: 4px; }
 
@@ -534,6 +535,34 @@
   0%, 6%    { background: #1d3a44; box-shadow: none; }
   13%, 86%  { background: #ff9ec4; box-shadow: 0 0 8px rgba(255, 158, 196, 0.45); }
   95%, 100% { background: #1d3a44; box-shadow: none; }
+}
+
+/* Contraire : l'encre du mot change, et le repère montre la pastille à toucher. */
+.art--contraire .m1 {
+  left: 13px; top: 19px; width: 50px; height: 14px; border-radius: 3px;
+  animation: miniEncre 3s steps(1, end) infinite;
+}
+.art--contraire .c1, .art--contraire .c2, .art--contraire .c3 {
+  top: 44px; width: 14px; height: 14px; border-radius: 3px;
+}
+.art--contraire .c1 { left: 13px; background: #d6342a; }
+.art--contraire .c2 { left: 31px; background: #3d7dff; }
+.art--contraire .c3 { left: 49px; background: #f5d018; }
+.art--contraire .p1 {
+  top: 62px; width: 14px; height: 3px; border-radius: 2px; background: var(--bone);
+  animation: miniPointe 3s steps(1, end) infinite;
+}
+
+@keyframes miniEncre {
+  0%   { background: #3d7dff; }
+  33%  { background: #f5d018; }
+  66%  { background: #d6342a; }
+}
+
+@keyframes miniPointe {
+  0%   { left: 31px; }
+  33%  { left: 49px; }
+  66%  { left: 13px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -27,6 +27,7 @@ jeux/fonte/             une machine
 jeux/bascule/           une machine
 jeux/reseau/            une machine
 jeux/trace/             une machine
+jeux/contraire/         une machine
 ```
 
 Chaque jeu charge `css/arcade.css` puis sa propre feuille, qui redéfinit
@@ -644,6 +645,55 @@ trait.
 | --- | --- | --- |
 | Poser le crayon, avancer | `Entrée` sur un point | toucher un point, ou glisser |
 | Effacer le tracé | `Échap` | bouton « Effacer » |
+| Recommencer | `R` | bouton « Nouvelle partie » |
+| Couper le son | `M` | bouton « Son » |
+
+### Contraire · accent violet
+
+Le mot ROUGE écrit en bleu : répondre bleu. C'est l'effet Stroop — lire est
+automatique, nommer une couleur ne l'est pas, et les deux se contrarient.
+
+- **La palette n'a pas été choisie à l'œil, et c'est le cœur de cette machine.**
+  Un jeu où l'on nomme des couleurs est injouable pour un daltonien si deux
+  couleurs se confondent, et faussement : le joueur croira se tromper. Chaque
+  candidate est donc passée dans les trois dichromaties courantes par les
+  matrices de Viénot-Brettel, convertie en Lab, et toutes les paires sont
+  mesurées en ΔE (CIE76).
+
+  | palette | ΔE minimal | où il tombe |
+  | --- | --- | --- |
+  | rouge · bleu · jaune · blanc | **46,1** | deutéranopie, rouge/jaune |
+  | + vert | 30,2 | deutéranopie, rouge/vert |
+  | + violet | **1,6** | protanopie, bleu/violet |
+
+- **Le violet est donc exclu de la palette jouable** : sur un écran en vision
+  normale il paraît idéal — c'est celui que j'aurais choisi — et il est
+  littéralement indiscernable du bleu pour un protanope. Aucune relecture à l'œil
+  ne l'aurait trouvé. Il sert au châssis, où il n'est jamais une réponse.
+- **On s'arrête à quatre couleurs.** Le vert passerait (ΔE 30 reste une
+  différence franche), mais la difficulté de ce jeu vient du temps et du
+  changement de consigne, pas d'un cinquième nom qui fragiliserait la palette.
+- Le banc d'essai **refait ce calcul sur les couleurs réellement livrées**, lues
+  dans le code du jeu : si une teinte change un jour, le test tombe avant le
+  joueur.
+- **La consigne s'inverse** de temps en temps — tantôt l'encre, tantôt le mot —
+  et ce changement coûte plus cher que le conflit lui-même. Il n'arrive jamais
+  avant la neuvième épreuve, puis tous les six à dix coups.
+- **La pause qui suit un changement de consigne, ou une erreur, ne consomme pas
+  le chrono.** Le surcoût du changement est déjà la difficulté ; le facturer une
+  deuxième fois en temps serait le compter deux fois.
+- **Le plancher de temps est la seule valeur de cette machine qui vienne de la
+  littérature et non d'une mesure faite ici** : le temps de réaction sur une
+  épreuve incongruente tourne autour de 800 ms chez l'adulte, choix de la réponse
+  compris, donc on ne descend pas sous 950 ms. La rampe part de 2,4 s et met une
+  quarantaine d'épreuves à y arriver.
+- Les pastilles **ne changent jamais de place**. Les mélanger ajouterait un coût
+  de recherche qui n'a rien à voir avec le conflit qu'on mesure ; les apprendre
+  fait partie du jeu.
+
+| Action | Clavier | Tactile / souris |
+| --- | --- | --- |
+| Répondre | `1` à `4`, dans l'ordre affiché | toucher une pastille |
 | Recommencer | `R` | bouton « Nouvelle partie » |
 | Couper le son | `M` | bouton « Son » |
 
