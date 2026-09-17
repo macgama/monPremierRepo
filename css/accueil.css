@@ -51,6 +51,7 @@
 .card--intrus  { --accent: #dd6ad0; }
 .card--cadence { --accent: #17b3a0; }
 .card--fonte   { --accent: #f0a12e; }
+.card--bascule { --accent: #8f7bff; }
 
 .card-body { display: grid; gap: 4px; }
 
@@ -459,6 +460,27 @@
 @keyframes miniPile {
   0%, 74%   { transform: scaleX(0.1); opacity: 0; }
   86%, 100% { transform: scaleX(1); opacity: 1; }
+}
+
+/* Bascule : la croix s'allume, puis tout s'éteint. */
+.art--bascule i { width: 16px; height: 16px; border-radius: 3px; background: #14303a; }
+.art--bascule .k1 { left: 10px; top: 10px; }
+.art--bascule .k2 { left: 30px; top: 10px; }
+.art--bascule .k3 { left: 50px; top: 10px; }
+.art--bascule .k4 { left: 10px; top: 30px; }
+.art--bascule .k5 { left: 30px; top: 30px; }
+.art--bascule .k6 { left: 50px; top: 30px; }
+.art--bascule .k7 { left: 10px; top: 50px; }
+.art--bascule .k8 { left: 30px; top: 50px; }
+.art--bascule .k9 { left: 50px; top: 50px; }
+.art--bascule .k2, .art--bascule .k4, .art--bascule .k5,
+.art--bascule .k6, .art--bascule .k8 { animation: miniBascule 2.8s ease-in-out infinite; }
+.art--bascule .k5 { animation-delay: -0.12s; }
+
+@keyframes miniBascule {
+  0%, 38%   { background: #14303a; }
+  48%, 82%  { background: #8f7bff; box-shadow: 0 0 10px rgba(143, 123, 255, 0.5); }
+  92%, 100% { background: #14303a; box-shadow: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

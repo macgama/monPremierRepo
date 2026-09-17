@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bascule — Machines</title>
+<meta name="description" content="Toucher une case retourne ses voisines. Tout éteindre, et si possible au par.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Bungee&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../../css/arcade.css">
+<link rel="stylesheet" href="bascule.css">
+</head>
+<body>
+<main class="cabinet">
+
+  <nav class="topbar"><a class="back" href="../../index.html">‹ Toutes les machines</a></nav>
+
+  <header class="head">
+    <h1 class="mark">Bascule</h1>
+    <p class="tag">Tout éteindre, au par</p>
+  </header>
+
+  <section class="readout" aria-label="Tableau de bord">
+    <div class="stat">
+      <span class="lab">Score</span>
+      <b class="val" id="score" aria-live="polite">0</b>
+    </div>
+    <div class="stat" id="reserveStat">
+      <span class="lab">Réserve</span>
+      <b class="val" id="reserve">40</b>
+    </div>
+    <div class="stat">
+      <span class="lab">Record</span>
+      <b class="val" id="best">0</b>
+    </div>
+  </section>
+
+  <div class="meter" id="meter">
+    <div class="meter-head">
+      <span class="lab" id="meterLab">Niveau 1 · par 3</span>
+      <span class="lab meter-left" id="coups">0 coup</span>
+    </div>
+    <div class="meter-track"><i id="jauge" style="width:0"></i></div>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="rail" aria-hidden="true"></div>
+    <div class="screen screen--bascule">
+      <div class="plateau" id="plateau"></div>
+      <p class="annonce" id="annonce" hidden></p>
+
+
+      <div class="pret" id="pret">
+        <p class="pret-titre">Tout éteindre</p>
+        <p>Toucher une case retourne <b>cette case et ses quatre voisines</b>. L'ordre
+          n'a aucune importance, et une case jouée deux fois revient à son état :
+          rien n'est jamais perdu.</p>
+        <p>Chaque grille a un <b>par</b> — le nombre minimal de coups, calculé, pas
+          estimé. L'éteindre recrédite votre réserve du par plus une prime ; jouer
+          large la vide.</p>
+        <p class="lab pulse">Touchez l'écran pour commencer</p>
+      </div>
+
+      <div class="over" id="over" hidden>
+        <p class="over-kicker">Réserve épuisée</p>
+        <p class="over-score" id="overScore">0</p>
+        <p class="over-note" id="overNote">points</p>
+        <div class="minigrille" id="overGrille" aria-hidden="true"></div>
+        <button class="btn btn--main" id="rejouer" type="button">Rejouer</button>
+      </div>
+    </div>
+    <div class="rail" aria-hidden="true"></div>
+  </div>
+
+  <p class="help">La méthode : éteignez une rangée en jouant sur celle du dessous, puis
+    descendez. Ce qui reste en bas dit ce qu'il fallait jouer en haut.</p>
+
+  <div class="foot">
+    <button class="ghost" id="restart" type="button">Nouvelle partie</button>
+    <button class="ghost" id="mute" type="button" aria-pressed="false">Son : actif</button>
+  </div>
+
+</main>
+<script src="../../js/arcade.js"></script>
+<script src="bascule.js"></script>
+</body>
+</html>

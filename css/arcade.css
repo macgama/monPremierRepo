@@ -354,6 +354,13 @@ body {
 
 .btn:active { transform: translateY(3px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1); }
 
+/* .btn--main porte flex: 1 pour occuper la rangée du pavé de commandes. L'écran
+   de fin, lui, est une colonne : le même flex: 1 y demandait toute la hauteur
+   libre, et le bouton « Rejouer » s'étirait sur trois cents pixels et plus dans
+   huit machines. Une direction de flex change le sens d'une propriété ; ce qui
+   se règle dans une rangée se dérègle dans une colonne. */
+.over .btn { flex: 0 0 auto; min-width: 180px; }
+
 .btn:focus-visible,
 .ghost:focus-visible,
 .back:focus-visible,

@@ -24,6 +24,7 @@ jeux/ricochet/          une machine
 jeux/intrus/            une machine
 jeux/cadence/           une machine
 jeux/fonte/             une machine
+jeux/bascule/           une machine
 ```
 
 Chaque jeu charge `css/arcade.css` puis sa propre feuille, qui redéfinit
@@ -514,6 +515,52 @@ refond tout pour repartir plus vite.
 | Acheter un bâtiment | — | son bouton, par 1, 10 ou au maximum |
 | Couper le son | — | bouton « Son » |
 
+### Bascule · accent indigo
+
+Toucher une case retourne cette case et ses quatre voisines. Tout éteindre, et
+si possible au par.
+
+- **Le jeu est un système linéaire sur GF(2)**, le corps à deux éléments où
+  1 + 1 = 0. Chaque coup est un vecteur : jouer deux fois la même case ne change
+  rien, et l'ordre des coups est sans importance. Trois conséquences, et ce sont
+  elles qui font le jeu.
+- **Une grille fabriquée en jouant des coups sur une grille éteinte est soluble
+  par construction.** Inutile de vérifier : c'est un théorème, pas un test.
+- **Le par se calcule.** On résout `Ax = b` par élimination de Gauss, puis on
+  parcourt le noyau de `A` et on garde la solution la plus légère. Ce n'est pas
+  une estimation ni le nombre de coups de mélange : c'est le minimum.
+- **L'échelle ne retient que les formes à noyau nul** — 3×3, 4×3, 5×4, 6×5,
+  6×6 — parce que la solution y est unique et que le par vaut alors exactement
+  le nombre de cases mêlées : on choisit la difficulté au lieu de la subir. La
+  4×4 et la 5×5 en sont exclues pour la raison inverse : leur noyau vaut 4 et 2,
+  et quel que soit le mélange leur par **plafonne à 7 et 15**.
+- **La chasse aux lumières retombe sur le par.** Descendre rangée par rangée en
+  éteignant celle du dessus, pour chacune des 2^largeur amorces possibles de la
+  rangée du haut, et garder la meilleure : sur 2 200 grilles, ce parcours donne
+  exactement le même nombre que l'élimination de Gauss. Deux méthodes
+  indépendantes qui s'accordent, c'est une vérification, pas une coïncidence.
+- **La réserve de coups est commune à toute la partie**, et non à chaque grille.
+  Un budget par grille punirait d'un coup le joueur qui a mal amorcé sa chasse ;
+  une réserve laisse une grille propre financer la suivante. Chaque grille
+  éteinte recrédite du par plus une prime.
+- **La prime sort de la mesure**, pas du doigt mouillé : le surcoût du chasseur
+  naïf vaut 2,1 · 3,3 · 5,4 · 9,2 · 11,5 coups selon la forme, et la prime vaut
+  ce surcoût plus quatre. Simulé sur 400 parties par profil, avec 40 coups au
+  départ : le joueur qui vise le par ne meurt pas, le chasseur méthodique tient
+  **une quarantaine de grilles**, le joueur brouillon **une douzaine**.
+- Le tâtonnement pur, lui, ne mène nulle part : sur une 5×5, taper au hasard une
+  case allumée ne résout la grille que **2 fois sur 300** en deux cents coups.
+  C'est pourquoi la ligne d'aide donne la méthode au lieu de la faire deviner.
+- À la fin, la grille se redessine **en miniature** dans l'écran de fin, avec les
+  coups qu'il restait à jouer. Les marquer sur le vrai plateau ne servait à
+  rien : le voile de fin le recouvre.
+
+| Action | Clavier | Tactile / souris |
+| --- | --- | --- |
+| Retourner une case | — | toucher la case |
+| Recommencer | `R` | bouton « Nouvelle partie » |
+| Couper le son | `M` | bouton « Son » |
+
 ## Ce que le socle fournit
 
 - **Le son**, entièrement synthétisé avec l'API Web Audio : aucun fichier audio
@@ -533,6 +580,13 @@ refond tout pour repartir plus vite.
   l'emporte sur le `display: none` par défaut du navigateur et l'élément reste
   visible. Le piège avait été rustiné douze fois, machine par machine, avant
   d'être corrigé à sa racine.
+- **La règle `.over .btn { flex: 0 0 auto; }`**, posée elle aussi une fois pour
+  toutes. `.btn--main` porte `flex: 1` pour occuper la rangée du pavé de
+  commandes ; l'écran de fin étant une colonne, ce même `flex: 1` y réclamait
+  toute la hauteur libre. Le bouton « Rejouer » mesurait **396 px de haut dans
+  Chute, 380 dans Rebond, 352 dans Stack** — huit machines touchées. Une
+  direction de flex change le sens d'une propriété : ce qui se règle dans une
+  rangée se dérègle dans une colonne.
 - **Le châssis** : rails, tableau de bord, jauge, pastilles de vies, écran de
   fin, boutons. Un composant remonte dans le socle dès qu'une deuxième machine
   s'en sert — les pastilles de vies y sont passées quand Écho a rejoint
