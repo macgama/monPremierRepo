@@ -25,6 +25,7 @@ jeux/intrus/            une machine
 jeux/cadence/           une machine
 jeux/fonte/             une machine
 jeux/bascule/           une machine
+jeux/reseau/            une machine
 ```
 
 Chaque jeu charge `css/arcade.css` puis sa propre feuille, qui redéfinit
@@ -558,6 +559,50 @@ si possible au par.
 | Action | Clavier | Tactile / souris |
 | --- | --- | --- |
 | Retourner une case | — | toucher la case |
+| Recommencer | `R` | bouton « Nouvelle partie » |
+| Couper le son | `M` | bouton « Son » |
+
+### Réseau · accent émeraude
+
+Des tuyaux en morceaux, chacun pivotant d'un quart de tour ; relier la source à
+toutes les bouches avant le chrono.
+
+- **La grille est fabriquée à l'envers**, depuis un arbre couvrant obtenu par
+  parcours en profondeur aléatoire : toutes les cases sont reliées, il n'y a
+  aucune boucle, et le nombre de raccords vaut exactement cases − 1. Puis chaque
+  tuile pivote au hasard. Vérifié sur 288 grilles servies par le jeu lui-même.
+- **Se raccorder n'est pas être relié**, et c'est le piège de ce jeu. Une grille
+  où chaque sortie tombe sur une sortie qui la lui rend peut parfaitement être
+  coupée en deux : un morceau détaché plus une boucle donne le même compte
+  d'arêtes qu'un arbre. Un solveur qui ne vérifie que les raccords compte donc
+  des solutions qui n'en sont pas. Celui-ci filtre sur « tout est relié à la
+  source », et c'est seulement après ce filtre que l'unicité veut dire quelque
+  chose.
+- **La solution est unique, et c'est vérifié grille par grille** avant de vous la
+  servir : le solveur énumère les configurations valides et s'arrête à la
+  deuxième. Mesuré : le générateur en profondeur donne **100 %** de grilles à
+  solution unique, contre 93 à 98 % pour un Kruskal aléatoire — d'où le choix du
+  premier. Le contrôle reste en place malgré tout, avec quarante essais.
+- **Le chrono se règle sur les quarts de tour qu'il faut vraiment jouer**, et non
+  sur ceux du brouillage. La différence n'est pas un détail : une tuile droite
+  retournée de deux quarts de tour est déjà en place, une croix l'est toujours,
+  et compter le brouillage surestimait le travail de 20 % — le temps accordé
+  était d'autant trop large. Le coût est compté **dans le seul sens horaire**,
+  celui que paie un joueur qui se contente de toucher l'écran ; le clic droit,
+  qui tourne dans l'autre sens, est un bonus, pas une obligation.
+- **Ce jeu contient la seule valeur de la collection que je n'aie pas pu
+  mesurer** : combien de secondes vaut un quart de tour pour une main humaine.
+  Elle est posée large — 1,7 s au premier niveau, resserrée jusqu'à 1,0 s — et
+  c'est le score, non la survie, qui récompense la vitesse.
+- Un temps écoulé coûte une vie et sert une **grille neuve au même niveau** :
+  rester bloqué sur une grille qu'on n'arrive pas à lire n'apprend rien.
+- À la fin de la partie, la grille **se remet d'elle-même en place** derrière le
+  voile, qui est translucide pour cette seule raison.
+
+| Action | Clavier | Tactile / souris |
+| --- | --- | --- |
+| Pivoter dans le sens des aiguilles | — | toucher la tuile |
+| Pivoter dans l'autre sens | — | clic droit sur la tuile |
 | Recommencer | `R` | bouton « Nouvelle partie » |
 | Couper le son | `M` | bouton « Son » |
 

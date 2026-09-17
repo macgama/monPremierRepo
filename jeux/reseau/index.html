@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Réseau — Machines</title>
+<meta name="description" content="Faire pivoter des tuyaux jusqu'à relier la source à toutes les bouches, avant le chrono.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Bungee&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../../css/arcade.css">
+<link rel="stylesheet" href="reseau.css">
+</head>
+<body>
+<main class="cabinet">
+
+  <nav class="topbar"><a class="back" href="../../index.html">‹ Toutes les machines</a></nav>
+
+  <header class="head">
+    <h1 class="mark">Réseau</h1>
+    <p class="tag">Tout relier à la source</p>
+  </header>
+
+  <section class="readout" aria-label="Tableau de bord">
+    <div class="stat">
+      <span class="lab">Score</span>
+      <b class="val" id="score" aria-live="polite">0</b>
+    </div>
+    <div class="stat">
+      <span class="lab">Record</span>
+      <b class="val" id="best">0</b>
+    </div>
+    <div class="stat">
+      <span class="lab">Vies</span>
+      <span class="vies" id="vies"></span>
+    </div>
+  </section>
+
+  <div class="meter" id="meter">
+    <div class="meter-head">
+      <span class="lab" id="meterLab">Niveau 1 · 3×3 · 1/9</span>
+      <span class="lab meter-left" id="chrono">30,0 s</span>
+    </div>
+    <div class="meter-track"><i id="jauge" style="width:100%"></i></div>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="rail" aria-hidden="true"></div>
+    <div class="screen screen--reseau">
+      <div class="plateau" id="plateau"></div>
+      <p class="annonce" id="annonce" hidden></p>
+
+      <div class="pret" id="pret">
+        <p class="pret-titre">Tout relier</p>
+        <p>Chaque tuile pivote d'un <b>quart de tour</b>. La source est au centre ;
+          ce qui lui est relié s'allume.</p>
+        <p>Il n'y a <b>qu'une seule</b> façon de tout relier : la grille est vérifiée
+          avant de vous être servie, et refaite si elle en admet deux.</p>
+        <p class="lab pulse">Touchez l'écran pour commencer</p>
+      </div>
+
+      <div class="over" id="over" hidden>
+        <p class="over-kicker">Réseau coupé</p>
+        <p class="over-score" id="overScore">0</p>
+        <p class="over-note" id="overNote">points</p>
+        <button class="btn btn--main" id="rejouer" type="button">Rejouer</button>
+      </div>
+    </div>
+    <div class="rail" aria-hidden="true"></div>
+  </div>
+
+  <p class="help">Un appui fait pivoter dans le sens des aiguilles ; le clic droit dans
+    l'autre. Une bouche isolée, un carré qui ne s'allume pas : c'est là qu'il faut regarder.</p>
+
+  <div class="foot">
+    <button class="ghost" id="restart" type="button">Nouvelle partie</button>
+    <button class="ghost" id="mute" type="button" aria-pressed="false">Son : actif</button>
+  </div>
+
+</main>
+<script src="../../js/arcade.js"></script>
+<script src="reseau.js"></script>
+</body>
+</html>

@@ -52,6 +52,7 @@
 .card--cadence { --accent: #17b3a0; }
 .card--fonte   { --accent: #f0a12e; }
 .card--bascule { --accent: #8f7bff; }
+.card--reseau  { --accent: #21c97a; }
 
 .card-body { display: grid; gap: 4px; }
 
@@ -481,6 +482,36 @@
   0%, 38%   { background: #14303a; }
   48%, 82%  { background: #8f7bff; box-shadow: 0 0 10px rgba(143, 123, 255, 0.5); }
   92%, 100% { background: #14303a; box-shadow: none; }
+}
+
+/* Réseau : le dernier tuyau pivote, et la ligne s'allume jusqu'au bout. */
+.art--reseau i { background: #1d4a44; }
+.art--reseau .s1 {
+  left: 18px; top: 18px; width: 11px; height: 11px; border-radius: 50%;
+  background: #21c97a; box-shadow: 0 0 10px rgba(33, 201, 122, 0.6);
+}
+.art--reseau .p1 { left: 22px; top: 26px; width: 4px; height: 26px; background: #21c97a; }
+.art--reseau .p2 { left: 22px; top: 48px; width: 26px; height: 4px; background: #21c97a; }
+.art--reseau .p3 {
+  left: 44px; top: 26px; width: 4px; height: 26px;
+  transform-origin: 2px 24px;
+  animation: miniPivote 3.2s ease-in-out infinite;
+}
+.art--reseau .b1 {
+  left: 40px; top: 20px; width: 12px; height: 12px; border-radius: 3px;
+  animation: miniBouche 3.2s ease-in-out infinite;
+}
+
+@keyframes miniPivote {
+  0%, 26%   { transform: rotate(-90deg); background: #1d4a44; }
+  44%, 88%  { transform: rotate(0deg); background: #21c97a; }
+  100%      { transform: rotate(-90deg); background: #1d4a44; }
+}
+
+@keyframes miniBouche {
+  0%, 30%   { background: #1d4a44; box-shadow: none; }
+  44%, 88%  { background: #21c97a; box-shadow: 0 0 9px rgba(33, 201, 122, 0.5); }
+  100%      { background: #1d4a44; box-shadow: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

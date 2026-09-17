@@ -1,0 +1,163 @@
+/* Réseau — la grille de tuyaux.
+   À charger après css/arcade.css. */
+
+:root {
+  --signal:      #21c97a;
+  --signal-deep: #0d6b41;
+  --panel-w:     390px;
+  --tube:        7px;
+}
+
+.stage { width: 100%; max-width: var(--panel-w); }
+
+.screen--reseau {
+  position: relative;
+  flex: 1;
+  display: grid;
+  grid-template-rows: 1fr 26px;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  min-height: 350px;
+  border-radius: 3px;
+}
+
+.plateau {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 3), 1fr);
+  gap: 3px;
+  width: 100%;
+  aspect-ratio: var(--cols, 3) / var(--rows, 3);
+}
+
+.tuile {
+  position: relative;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  cursor: pointer;
+  background: #0f2429;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  transition: background 160ms ease;
+}
+.tuile:hover { background: #143036; }
+
+/* Le tuyau tourne, pas la case : la rotation est une transformation CSS, et la
+   logique ne connaît que le nombre de quarts de tour. */
+.tuyau {
+  position: absolute;
+  inset: 0;
+  transition: transform 170ms cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+
+.bras {
+  position: absolute;
+  background: var(--rail-2);
+  border-radius: 2px;
+  transition: background 180ms ease, box-shadow 180ms ease;
+}
+.bras.n { left: 50%; top: 0;    width: var(--tube); height: 54%; transform: translateX(-50%); }
+.bras.s { left: 50%; bottom: 0; width: var(--tube); height: 54%; transform: translateX(-50%); }
+.bras.o { top: 50%; left: 0;    height: var(--tube); width: 54%; transform: translateY(-50%); }
+.bras.e { top: 50%; right: 0;   height: var(--tube); width: 54%; transform: translateY(-50%); }
+
+.moyeu {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--tube) + 5px);
+  height: calc(var(--tube) + 5px);
+  border-radius: 50%;
+  background: var(--rail-2);
+  transform: translate(-50%, -50%);
+  transition: background 180ms ease, box-shadow 180ms ease;
+}
+
+/* Une bouche : un seul bras, terminé par un carré. */
+.tuile.bouche .bras::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  background: var(--rail-2);
+  transition: background 180ms ease, box-shadow 180ms ease;
+}
+/* Le carré se range à l'intérieur de la tuile, jamais à cheval sur son bord :
+   une bouche tournée vers l'extérieur du plateau se faisait sinon rogner. */
+.tuile.bouche .bras.n::after { top: 0; left: 50%; transform: translateX(-50%); }
+.tuile.bouche .bras.s::after { bottom: 0; left: 50%; transform: translateX(-50%); }
+.tuile.bouche .bras.o::after { left: 0; top: 50%; transform: translateY(-50%); }
+.tuile.bouche .bras.e::after { right: 0; top: 50%; transform: translateY(-50%); }
+
+/* Relié à la source : tout s'allume. */
+.tuile.relie .bras,
+.tuile.relie .moyeu,
+.tuile.relie.bouche .bras::after {
+  background: var(--signal);
+  box-shadow: 0 0 10px rgba(33, 201, 122, 0.45);
+}
+
+/* La source elle-même, toujours allumée, avec son anneau. */
+.tuile.source .moyeu {
+  width: calc(var(--tube) + 13px);
+  height: calc(var(--tube) + 13px);
+  background: var(--signal);
+  box-shadow: 0 0 0 3px rgba(33, 201, 122, 0.25), 0 0 16px rgba(33, 201, 122, 0.55);
+}
+
+.tuile.boucle { animation: boucle 640ms ease-out; }
+
+@keyframes boucle {
+  0%   { background: rgba(33, 201, 122, 0.4); }
+  100% { background: #0f2429; }
+}
+
+/* ---------- messages et voiles ---------- */
+
+.annonce {
+  align-self: center;
+  margin: 0;
+  padding: 5px 10px;
+  border-radius: 3px;
+  text-align: center;
+  background: rgba(13, 107, 65, 0.9);
+  box-shadow: inset 0 0 0 1px rgba(33, 201, 122, 0.45);
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--bone);
+  animation: fade 200ms ease-out;
+}
+
+.pret {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 22px;
+  text-align: center;
+  cursor: pointer;
+  background: rgba(9, 21, 24, 0.94);
+}
+
+.pret-titre {
+  margin: 0;
+  font-family: Bungee, Archivo, sans-serif;
+  font-size: 19px;
+  letter-spacing: 0.08em;
+  color: var(--bone);
+}
+
+.pret p { margin: 0; max-width: 30ch; font-size: 12.5px; line-height: 1.55; color: var(--dim); }
+.pret b { color: var(--signal); font-weight: 600; }
+.pret .pulse { animation: alarm 1.8s ease-in-out infinite; }
+
+/* L'écran de fin laisse voir la grille remise en ordre derrière lui. */
+.screen--reseau .over { background: rgba(9, 21, 24, 0.82); }
+.over-note b { color: var(--signal); font-weight: 700; }
+
+@media (max-width: 380px) { :root { --tube: 6px; } }
