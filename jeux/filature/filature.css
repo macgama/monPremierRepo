@@ -1,0 +1,178 @@
+/* Filature — le plan et les cônes.
+   À charger après css/arcade.css.
+
+   Le châssis est froid, le danger est chaud : les cônes de vision sont la seule
+   chose ambrée de l'écran, et on les voit donc avant de les lire. */
+
+:root {
+  --signal:      #7fd4ff;
+  --signal-deep: #24566f;
+  --danger:      #ff9b3d;
+  --panel-w:     400px;
+}
+
+.stage { width: 100%; max-width: var(--panel-w); }
+
+.screen--filature {
+  position: relative;
+  flex: 1;
+  display: grid;
+  grid-template-rows: 1fr 26px;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  min-height: 330px;
+  border-radius: 3px;
+}
+
+.plateau {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 7), 1fr);
+  gap: 2px;
+  width: 100%;
+  aspect-ratio: var(--cols, 7) / var(--rows, 7);
+}
+
+.case {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: #102a30;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+  font-size: 11px;
+  line-height: 1;
+  color: var(--ink);
+  cursor: default;
+  transition: background 120ms ease, box-shadow 120ms ease;
+}
+
+/* Un mur bloque le pas ET le regard : il doit se distinguer du sol sans
+   hésitation possible, pas d'une nuance. */
+.case.mur {
+  background: linear-gradient(to bottom, #3a6b76, #24505a);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Une case éclairée : c'est le seul ambre de l'écran. */
+.case.vu {
+  background: rgba(255, 155, 61, 0.28);
+  box-shadow: inset 0 0 0 1px rgba(255, 155, 61, 0.55);
+}
+
+.case.sortie {
+  background: var(--signal-deep);
+  box-shadow: inset 0 0 0 2px var(--signal);
+}
+.case.sortie::after {
+  content: '';
+  width: 42%;
+  height: 42%;
+  border-radius: 1px;
+  background: var(--signal);
+  box-shadow: 0 0 10px rgba(127, 212, 255, 0.7);
+}
+.case.sortie.vu { background: rgba(255, 155, 61, 0.3); }
+
+.case.depart { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16); }
+
+/* Les cases où l'on peut aller au prochain coup : un liseré, pas un fond. Un
+   fond clair les rendait confusables avec les murs, qui sont clairs aussi. */
+.case.offerte {
+  cursor: pointer;
+  box-shadow: inset 0 0 0 2px rgba(127, 212, 255, 0.5);
+}
+.case.offerte.vu {
+  box-shadow: inset 0 0 0 2px rgba(127, 212, 255, 0.5), inset 0 0 0 20px rgba(255, 155, 61, 0.3);
+}
+.case.offerte:hover { box-shadow: inset 0 0 0 2px var(--signal); }
+
+.case.veilleur {
+  background: #2a2119;
+  box-shadow: inset 0 0 0 2px var(--danger);
+}
+.case.veilleur .regard {
+  font-size: 13px;
+  color: var(--danger);
+  line-height: 1;
+}
+.case.veilleur .sens {
+  position: absolute;
+  right: 1px;
+  bottom: 0;
+  font-size: 9px;
+  color: rgba(255, 155, 61, 0.75);
+}
+
+/* Le joueur. */
+.case.moi::before {
+  content: '';
+  position: absolute;
+  inset: 14%;
+  border-radius: 50%;
+  background: var(--bone);
+  box-shadow: 0 0 12px rgba(232, 226, 212, 0.65);
+}
+.case.moi.vu::before { background: var(--danger); box-shadow: 0 0 16px rgba(255, 155, 61, 0.9); }
+
+/* À la fin, le passage minimal. */
+.case.montre {
+  box-shadow: inset 0 0 0 2px rgba(127, 212, 255, 0.8);
+  animation: respire 1.8s ease-in-out infinite;
+}
+
+@keyframes respire { 50% { box-shadow: inset 0 0 0 2px rgba(127, 212, 255, 0.28); } }
+
+/* ---------- messages et voiles ---------- */
+
+.annonce {
+  align-self: center;
+  margin: 0;
+  padding: 5px 10px;
+  border-radius: 3px;
+  text-align: center;
+  background: rgba(36, 86, 111, 0.94);
+  box-shadow: inset 0 0 0 1px rgba(127, 212, 255, 0.45);
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--bone);
+  animation: fade 200ms ease-out;
+}
+
+.pret {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  background: rgba(9, 21, 24, 0.95);
+}
+
+.pret-titre {
+  margin: 0;
+  font-family: Bungee, Archivo, sans-serif;
+  font-size: 19px;
+  letter-spacing: 0.08em;
+  color: var(--bone);
+}
+
+.pret p { margin: 0; max-width: 32ch; font-size: 12.5px; line-height: 1.55; color: var(--dim); }
+.pret b { color: var(--signal); font-weight: 600; }
+.pret .pulse { animation: alarm 1.8s ease-in-out infinite; }
+
+.over-note b { color: var(--signal); font-weight: 700; }
+.help em { color: var(--bone); font-style: normal; }
+
+/* Attendre est un coup à part entière, donc un vrai bouton — mais il ne doit pas
+   tirer l'œil plus que le plan lui-même. */
+.btn--large { flex: 1; letter-spacing: 0.04em; }

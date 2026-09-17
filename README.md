@@ -29,6 +29,7 @@ jeux/reseau/            une machine
 jeux/trace/             une machine
 jeux/contraire/         une machine
 jeux/balance/           une machine
+jeux/filature/          une machine
 ```
 
 Chaque jeu charge `css/arcade.css` puis sa propre feuille, qui redéfinit
@@ -750,6 +751,52 @@ Vingt planches au bord d'une table, et le vide. Aller le plus loin possible.
 | Viser | `←` `→` (fin : `Maj`) | glisser sur le plateau |
 | Poser | `Espace` | relâcher |
 | Recommencer | `R` | bouton « Nouvelle tentative » |
+| Couper le son | `M` | bouton « Son » |
+
+### Filature · accent bleu projecteur
+
+Un plan vu de dessus, des veilleurs dont le cône tourne d'un quart de tour par
+tour, une sortie. Au tour par tour : rien n'est laissé au réflexe.
+
+- **Un tour, c'est le joueur qui avance d'une case — ou attend — puis les cônes
+  qui tournent.** L'ordre compte : il faut donc prévoir où sera la lumière après
+  son pas, pas où elle est pendant. La flèche dit où regarde un veilleur, un
+  petit rond dans quel sens il tourne ; toute l'information est à l'écran, et
+  c'est l'anticipation qui est le travail.
+- **L'état complet du plan est (case du joueur, phase mod 4)** — quatre fois le
+  nombre de cases, pas plus, puisque tous les veilleurs tournent d'un quart par
+  tour. Un parcours en largeur sur cet état dit donc exactement si un plan est
+  franchissable et en combien de tours au minimum. Aucun plan impossible n'est
+  servi, et ce n'est pas une espérance : c'est une vérification avant service.
+- **Le minimum est confirmé par un second solveur**, écrit autrement — file
+  d'attente sur des chaînes, ensembles au lieu de tableaux typés, aucun code
+  partagé avec celui du jeu. Sur 150 plans servis, les deux s'accordent à chaque
+  fois. Le banc vérifie aussi que le chemin rendu est **jouable pas à pas** :
+  chaque case voisine de la précédente, libre, et non éclairée à la phase où on
+  y arrive.
+- **L'échelle vient de la mesure, pas de l'intuition.** La marche au hasard —
+  celle qui prend chaque tour un coup sûr tiré au hasard — réussit **23 % du
+  temps sur le premier palier et 2 % sur le dernier**. Les paliers suivent cette
+  chute : 7×7 avec deux veilleurs, jusqu'à 11×9 avec sept.
+- Le budget de tours vaut le minimum doublé plus six : assez pour hésiter, pas
+  assez pour attendre que les cônes s'alignent tout seuls.
+- **Se faire voir redonne le même plan**, comme dans Tracé et contrairement à
+  Réseau. La règle est la même partout dans la collection : on resserre le même
+  problème quand on vient d'apprendre quelque chose sur lui (ici le rythme des
+  cônes), et on en change quand y rester bloqué n'apprend rien.
+- Le marquage du passage minimal, à la fin, se pose **après** le rendu et non
+  avant : le rendu réécrit la classe de chaque case, et les marques s'effaçaient
+  aussitôt posées. Le banc d'essai l'a trouvé, pas l'œil.
+- Les murs sont dessinés en relief franc, pas d'une nuance : un mur bloque le pas
+  **et** le regard, il ne doit pas se confondre avec le sol. Les cases
+  atteignables sont marquées d'un liseré et non d'un fond clair, pour la même
+  raison — un fond clair les rendait confusables avec les murs.
+
+| Action | Clavier | Tactile / souris |
+| --- | --- | --- |
+| Avancer | flèches | toucher une case voisine |
+| Attendre un tour | `Espace` | bouton « Attendre un tour » |
+| Recommencer | `R` | bouton « Nouvelle partie » |
 | Couper le son | `M` | bouton « Son » |
 
 ## Une machine écartée : Mèche

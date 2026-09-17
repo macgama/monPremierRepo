@@ -56,6 +56,7 @@
 .card--trace   { --accent: #ff9ec4; }
 .card--contraire { --accent: #a86dff; }
 .card--balance { --accent: #cf7a4a; }
+.card--filature { --accent: #7fd4ff; }
 
 .card-body { display: grid; gap: 4px; }
 
@@ -593,6 +594,27 @@
   74%       { transform: rotate(4deg); }
   86%, 100% { transform: rotate(0deg); }
 }
+
+/* Filature : le cône du veilleur balaie, et l'ombre attend qu'il passe. */
+.art--filature .g1 {
+  left: 30px; top: 12px; width: 15px; height: 15px; border-radius: 2px;
+  background: #2a2119; box-shadow: inset 0 0 0 2px #ff9b3d;
+}
+.art--filature .c1, .art--filature .c2, .art--filature .c3 {
+  width: 15px; height: 15px; border-radius: 2px;
+  background: rgba(255, 155, 61, 0.3);
+  box-shadow: inset 0 0 0 1px rgba(255, 155, 61, 0.55);
+}
+.art--filature .c1 { left: 30px; top: 30px; animation: miniCone 3.2s steps(1, end) infinite; }
+.art--filature .c2 { left: 30px; top: 48px; animation: miniCone 3.2s steps(1, end) infinite; }
+.art--filature .c3 { left: 12px; top: 30px; animation: miniCone2 3.2s steps(1, end) infinite; }
+.art--filature .m1 {
+  left: 48px; top: 48px; width: 13px; height: 13px; border-radius: 50%;
+  background: var(--bone); box-shadow: 0 0 9px rgba(232, 226, 212, 0.5);
+}
+
+@keyframes miniCone  { 0%, 46% { opacity: 1; } 50%, 100% { opacity: 0; } }
+@keyframes miniCone2 { 0%, 46% { opacity: 0; } 50%, 100% { opacity: 1; } }
 
 @media (prefers-reduced-motion: reduce) {
   .art i { animation: none !important; }
