@@ -28,6 +28,7 @@ jeux/bascule/           une machine
 jeux/reseau/            une machine
 jeux/trace/             une machine
 jeux/contraire/         une machine
+jeux/balance/           une machine
 ```
 
 Chaque jeu charge `css/arcade.css` puis sa propre feuille, qui redéfinit
@@ -695,6 +696,60 @@ automatique, nommer une couleur ne l'est pas, et les deux se contrarient.
 | --- | --- | --- |
 | Répondre | `1` à `4`, dans l'ordre affiché | toucher une pastille |
 | Recommencer | `R` | bouton « Nouvelle partie » |
+| Couper le son | `M` | bouton « Son » |
+
+### Balance · accent terre cuite
+
+Vingt planches au bord d'une table, et le vide. Aller le plus loin possible.
+
+- **Le critère de stabilité est exact, et il ne porte pas que sur le sol.** À
+  chaque contact, le centre de masse de tout ce qui se trouve au-dessus doit
+  tomber dans la zone de recouvrement des deux planches en contact. Un seul
+  contact qui manque fait pivoter toute la partie supérieure — c'est pourquoi
+  une tour peut verser en son milieu.
+- **Ce critère a un juge indépendant, et c'est lui qui donne son objectif au
+  jeu** : le porte-à-faux maximal de n planches au bord d'une table vaut ½·Hₙ,
+  la moitié de la somme harmonique. Le banc d'essai le vérifie dans les deux
+  sens, sur le code livré : la pile optimale est acceptée à la précision de la
+  virgule flottante près pour n de 1 à 20, et refusée dès qu'on la pousse d'un
+  millième. Pour vingt planches, ½·H₂₀ = 1,7989 — les **180 centièmes** affichés
+  comme cible ne sont pas un chiffre rond choisi par moi.
+- **La pile optimale est exactement critique** : sa marge vaut zéro à chaque
+  contact. Un test écrit « la tour tient si la marge est positive » la déclare
+  donc effondrée, et la cible annoncée devient inatteignable — c'était le cas
+  jusqu'à ce que le banc d'essai le montre. On tient debout à la limite.
+- **La fenêtre de pose se calcule, elle ne se cherche pas.** Chaque contrainte
+  est linéaire en l'abscisse de la nouvelle planche : à son propre contact son
+  centre doit tomber sur la planche du dessous, et à chaque contact plus bas le
+  centre de masse devient (S + x·l)/(M + l), qui doit rester entre les bords de
+  l'appui. L'intersection de ces intervalles est la fenêtre exacte, en un seul
+  passage. Confrontée au critère de stabilité sur 7 000 poses tirées au hasard :
+  **7 000 accords**.
+- **Ce qui fait le jeu tient en une phrase mesurée : la punition est différée.**
+  À chaque pose, la fenêtre stable est large — on peut presque toujours pousser
+  la planche d'une demi-longueur. Mais pousser tôt verrouille tout ce qui vient
+  après. Les trois façons de jouer les vingt planches, mesurées contre le code
+  livré :
+
+  | façon de jouer | score | ce qui arrive |
+  | --- | --- | --- |
+  | pousser au maximum | **50** | la tour verse à la deuxième planche |
+  | ne jamais dépasser | **0** | vingt planches posées, aucun porte-à-faux |
+  | décalages harmoniques | **180** | l'optimum, atteint exactement |
+
+  Il faut de tout petits décalages en bas et de grands en haut — donc deviner
+  combien de planches il reste. Aucune fraction fixe n'approche la borne : entre
+  0,50 pour le gourmand et 0,94 pour le très prudent, contre 2,14 à quarante
+  planches.
+- Le basculement à l'écran est **une image, pas une simulation** : ce qui décide
+  est le critère, et l'animation fait pivoter ce qui est au-dessus du contact
+  fautif autour du bord de son appui. Le jeu ne contient aucun moteur physique.
+
+| Action | Clavier | Tactile / souris |
+| --- | --- | --- |
+| Viser | `←` `→` (fin : `Maj`) | glisser sur le plateau |
+| Poser | `Espace` | relâcher |
+| Recommencer | `R` | bouton « Nouvelle tentative » |
 | Couper le son | `M` | bouton « Son » |
 
 ## Une machine écartée : Mèche

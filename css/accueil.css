@@ -55,6 +55,7 @@
 .card--reseau  { --accent: #21c97a; }
 .card--trace   { --accent: #ff9ec4; }
 .card--contraire { --accent: #a86dff; }
+.card--balance { --accent: #cf7a4a; }
 
 .card-body { display: grid; gap: 4px; }
 
@@ -563,6 +564,34 @@
   0%   { left: 31px; }
   33%  { left: 49px; }
   66%  { left: 13px; }
+}
+
+/* Balance : quatre planches en escalier au bord de la table, et celle du haut
+   qui hésite. */
+.art--balance .t1 {
+  left: 0; bottom: 12px; width: 30px; height: 9px;
+  background: #24454c; border-radius: 0 2px 2px 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.art--balance .p1, .art--balance .p2, .art--balance .p3, .art--balance .p4 {
+  width: 30px; height: 6px; border-radius: 1px;
+  background: linear-gradient(to bottom, #b98a5e, #6f4b2c);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.art--balance .p1 { left: 14px; bottom: 21px; }
+.art--balance .p2 { left: 21px; bottom: 28px; }
+.art--balance .p3 { left: 31px; bottom: 35px; }
+.art--balance .p4 {
+  left: 45px; bottom: 42px;
+  background: linear-gradient(to bottom, #e0a877, #cf7a4a);
+  transform-origin: 4px 6px;
+  animation: miniPenche 3.4s ease-in-out infinite;
+}
+
+@keyframes miniPenche {
+  0%, 62%   { transform: rotate(0deg); }
+  74%       { transform: rotate(4deg); }
+  86%, 100% { transform: rotate(0deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
